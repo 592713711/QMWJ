@@ -1,0 +1,63 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/loginbg"
+    tools:context=".MainActivity">
+
+
+    <ImageButton
+        android:id="@+id/imageButton"
+        android:layout_width="320dp"
+        android:layout_height="55dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="55dp"
+        android:background="@drawable/loginbtn_bg"
+        android:onClick="doLogin"
+        android:scaleType="fitXY" />
+
+    <EditText
+        android:id="@+id/user_text"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/imageButton"
+        android:layout_alignEnd="@+id/imageButton"
+        android:layout_marginBottom="67dp"
+        android:layout_marginEnd="18dp"
+        android:background="@null"
+        android:hint="Username"
+        android:inputType="number"
+        android:singleLine="true"
+        android:textColor="#0a0a0a"
+        android:textColorHint="#bebebe"
+        android:textSize="18sp" />
+
+    <EditText
+        android:id="@+id/pwd_text"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/imageButton"
+        android:layout_alignStart="@+id/user_text"
+        android:layout_marginBottom="24dp"
+        android:ems="10"
+        android:inputType="textPassword"
+        android:background="@null"
+        android:hint="Password"
+        android:singleLine="true"
+        android:textColor="#0a0a0a"
+        android:textColorHint="#bebebe"
+        android:textSize="18sp"/>
+
+
+    <ImageView
+        android:layout_width="60dp"
+        android:layout_height="40dp"
+        android:id="@+id/imageView2"
+        android:src="@drawable/logintext"
+        android:layout_marginTop="15dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+
+
+</RelativeLayout>
