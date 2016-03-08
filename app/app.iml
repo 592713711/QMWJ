@@ -92,13 +92,21 @@
     </content>
     <orderEntry type="jdk" jdkName="Android API 23 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" exported="" name="baidumapapi_cloud_v3_6_1" level="project" />
+    <orderEntry type="library" exported="" name="baidumapapi_radar_v3_6_1" level="project" />
+    <orderEntry type="library" exported="" name="netty-all-4.0.18.Final-sources" level="project" />
+    <orderEntry type="library" exported="" name="baidumapapi_base_v3_6_1" level="project" />
+    <orderEntry type="library" exported="" name="baidumapapi_util_v3_6_1" level="project" />
+    <orderEntry type="library" exported="" name="netty-all-4.0.18.Final" level="project" />
+    <orderEntry type="library" exported="" name="support-v4-23.0.0" level="project" />
+    <orderEntry type="library" exported="" name="locSDK_6.13" level="project" />
     <orderEntry type="library" exported="" name="percent-22.2.0" level="project" />
     <orderEntry type="library" exported="" name="gson-2.6.1" level="project" />
-    <orderEntry type="library" exported="" name="netty-all-4.0.18.Final-sources" level="project" />
+    <orderEntry type="library" exported="" name="baidumapapi_map_v3_6_1" level="project" />
+    <orderEntry type="library" exported="" name="baidumapapi_search_v3_6_1" level="project" />
     <orderEntry type="library" exported="" name="appcompat-v7-23.0.0" level="project" />
-    <orderEntry type="library" exported="" name="netty-all-4.0.18.Final" level="project" />
+    <orderEntry type="library" exported="" name="eventbus-3.0.0" level="project" />
     <orderEntry type="library" exported="" name="recyclerview-v7-23.0.0" level="project" />
-    <orderEntry type="library" exported="" name="support-v4-23.0.0" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-23.0.0" level="project" />
     <orderEntry type="module" module-name="library" exported="" />
   </component>

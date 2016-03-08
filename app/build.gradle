@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "com.ld.qmwj"
-        minSdkVersion 18
+        minSdkVersion 19
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
@@ -27,4 +27,7 @@ dependencies {
     compile files('libs/netty-all-4.0.18.Final.jar')
     compile 'com.android.support:percent:22.2.0'
     compile project(':libraries:library')
+    compile files('libs/baidumapapi_base_v3_6_1.jar')
+    compile files('libs/locSDK_6.13.jar')
+    compile files('libs/eventbus-3.0.0.jar')
 }

@@ -1,0 +1,208 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="control.map.MapFragment">
+
+    <android.support.percent.PercentRelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".MainActivity">
+
+
+        <com.baidu.mapapi.map.MapView
+            android:id="@+id/bmapView"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_heightPercent="100%"
+            app:layout_widthPercent="100%"></com.baidu.mapapi.map.MapView>
+
+
+        <android.support.percent.PercentRelativeLayout
+            android:id="@+id/head"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="#ffffff"
+            app:layout_heightPercent="8%"
+            app:layout_widthPercent="100%">
+
+            <ImageButton
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="#00000000"
+                android:id="@+id/back_btn"
+                android:scaleType="fitXY"
+                android:src="@drawable/back_btn"
+                app:layout_heightPercent="100%"
+                app:layout_marginLeftPercent="2%"
+                app:layout_widthPercent="10%" />
+
+            <RadioGroup
+                android:id="@+id/way_type"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:gravity="center"
+                android:orientation="horizontal"
+                app:layout_heightPercent="70%"
+                app:layout_marginLeftPercent="15%"
+                app:layout_marginTopPercent="15%"
+                app:layout_widthPercent="70%">
+
+                <RadioButton
+                    android:id="@+id/bus_radio"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:background="@drawable/bus_btn"
+                    android:button="@null" />
+
+                <RadioButton
+                    android:id="@+id/car_radio"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginLeft="45dp"
+                    android:background="@drawable/car_btn"
+                    android:button="@null" />
+
+                <RadioButton
+                    android:id="@+id/walk_radio"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginLeft="45dp"
+                    android:background="@drawable/walk_btn"
+                    android:button="@null"
+                    android:checked="true" />
+
+            </RadioGroup>
+
+            <ImageButton
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="#00000000"
+                android:id="@+id/search_btn"
+                android:scaleType="fitXY"
+                android:src="@android:drawable/ic_menu_search"
+                app:layout_heightPercent="80%"
+                app:layout_marginLeftPercent="88%"
+                app:layout_marginTopPercent="10%"
+                app:layout_widthPercent="10%" />
+
+        </android.support.percent.PercentRelativeLayout>
+
+        <android.support.percent.PercentRelativeLayout
+            android:id="@+id/bottom"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_marginTopPercent="89%"
+            android:background="#ffffff"
+            app:layout_heightPercent="7%"
+            app:layout_widthPercent="100%">
+
+            <TextView
+                android:id="@+id/location_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="10dp"
+                android:text="在地图上点击要到达的位置" />
+
+        </android.support.percent.PercentRelativeLayout>
+
+
+        <android.support.percent.PercentRelativeLayout
+            android:id="@+id/bottom2"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_marginTopPercent="85%"
+            android:background="#ffffff"
+            app:layout_heightPercent="11%"
+            app:layout_widthPercent="100%">
+
+            <TextView
+                android:id="@+id/location_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_marginTopPercent="10%"
+                app:layout_marginLeftPercent="5%"
+                android:text="刚刚宝贝在：" />
+
+            <TextView
+                android:id="@+id/location_text2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_marginTopPercent="50%"
+                app:layout_marginLeftPercent="5%"
+                android:text="暂无对方位置信息"
+                android:textSize="16sp"
+                android:textColor="#333333"/>
+
+        </android.support.percent.PercentRelativeLayout>
+
+        <CheckBox
+            android:id="@+id/more_btn"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/more_btn"
+            android:button="@null"
+            app:layout_heightPercent="7%"
+            app:layout_marginLeftPercent="86%"
+            app:layout_marginTopPercent="15%"
+            app:layout_widthPercent="11%" />
+
+        <android.support.percent.PercentRelativeLayout
+            android:id="@+id/more_menu"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="#ffffff"
+            app:layout_heightPercent="20%"
+            android:visibility="gone"
+            app:layout_marginLeftPercent="37%"
+            app:layout_marginTopPercent="22%"
+            app:layout_widthPercent="60%">
+
+            <ImageButton
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="#00000000"
+                android:scaleType="fitXY"
+                android:id="@+id/mark_btn"
+                android:src="@drawable/mark_btn"
+                app:layout_heightPercent="20%"
+                app:layout_marginLeftPercent="8%"
+                app:layout_marginTopPercent="10%"
+                app:layout_widthPercent="15%"
+                android:onClick="doMark"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="标记"
+                app:layout_marginLeftPercent="10%"
+                app:layout_marginTopPercent="31%"
+                android:textSize="12sp"/>
+
+            <ImageButton
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="#00000000"
+                android:scaleType="fitXY"
+                android:id="@+id/refresh_btn"
+                android:src="@drawable/refresh_btn"
+                app:layout_heightPercent="20%"
+                app:layout_marginLeftPercent="45%"
+                app:layout_marginTopPercent="10%"
+                app:layout_widthPercent="15%" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="刷新"
+                app:layout_marginLeftPercent="47%"
+                app:layout_marginTopPercent="31%"
+                android:textSize="12sp"/>
+        </android.support.percent.PercentRelativeLayout>
+
+    </android.support.percent.PercentRelativeLayout>
+
+
+</FrameLayout>

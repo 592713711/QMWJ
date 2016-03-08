@@ -7,6 +7,8 @@
     android:fitsSystemWindows="true"
     tools:context="control.home.MonitorActivity">
 
+
+
     <android.support.percent.PercentRelativeLayout
         android:id="@+id/head"
         android:layout_width="0dp"
@@ -57,15 +59,22 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_alignParentBottom="true"
-        android:background="#f6f6f6"
+        android:background="#f9f9f9"
         app:layout_heightPercent="8%"
         app:layout_widthPercent="100%">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_alignParentTop="true"
+            android:background="#eeeeee"
+            />
 
         <RadioGroup
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:orientation="horizontal"
             app:layout_heightPercent="100%"
+            android:id="@+id/radio_group"
             app:layout_widthPercent="100%">
 
             <TextView
@@ -83,6 +92,7 @@
                    android:gravity="center"
                    android:scaleType="fitXY"
                    android:layout_marginTop="5dp"
+                   android:checked="true"
                    android:layout_marginBottom="6dp"
                    />
 

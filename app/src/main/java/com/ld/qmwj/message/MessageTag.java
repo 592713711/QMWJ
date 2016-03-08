@@ -18,7 +18,9 @@ public class MessageTag {
     public static final int REFRESHLIST_REQ=3;
     public static final int REFRESHLIST_RES=4;
 
-    //
+    //请求位置标识
+    public static final int LOCATION_REQ=5;
+    public static final int LOCATION_RES=6;
 
 
 }

@@ -14,7 +14,7 @@ import com.ld.qmwj.R;
  * 登陆时 弹出的等待自定义对话框
  */
 
-public class LoadingDialog extends DialogFragment
+public class WaitDialog extends DialogFragment
 {
 
 	private String mMsg = "Loading";

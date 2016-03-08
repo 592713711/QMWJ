@@ -38,17 +38,18 @@ public class RcAdapter extends RecyclerView.Adapter {
 
     /**
      * 设置监听器
+     *
      * @return
      */
-    public void setItemOnClickListener(RecycleViewOnItemClick listener){
-        this.lis=listener;
+    public void setItemOnClickListener(RecycleViewOnItemClick listener) {
+        this.lis = listener;
     }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         MyHolder holder;
         View v = inflater.inflate(R.layout.monitor_list_item, null);
-        holder = new MyHolder(v,lis);
+        holder = new MyHolder(v, lis);
         return holder;
     }
 
@@ -74,7 +75,8 @@ public class RcAdapter extends RecyclerView.Adapter {
         BadgeView mBadgeView;
         CircleImageView head_btn;
         RecycleViewOnItemClick lis;
-        public MyHolder(View itemView,RecycleViewOnItemClick lis) {
+
+        public MyHolder(View itemView, RecycleViewOnItemClick lis) {
             super(itemView);
             name = (TextView) itemView.findViewById(R.id.name);
             msg = (TextView) itemView.findViewById(R.id.message);
@@ -82,13 +84,13 @@ public class RcAdapter extends RecyclerView.Adapter {
             mBadgeView = (BadgeView) itemView.findViewById(R.id.badgeView);
             head_btn = (CircleImageView) itemView.findViewById(R.id.headicon_view);
 
-            this.lis=lis;
+            this.lis = lis;
             itemView.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View v) {
-            lis.onItemClick(v,getAdapterPosition());
+            lis.onItemClick(v, getAdapterPosition());
         }
     }
 

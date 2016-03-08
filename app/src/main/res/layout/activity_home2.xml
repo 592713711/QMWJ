@@ -1,13 +1,168 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     tools:context="under_control.home.HomeActivity_under">
 
-    <TextView android:text="被监护方" android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        />
+    <android.support.percent.PercentRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="true"
+        android:fitsSystemWindows="true"
+        tools:context="control.home.MonitorActivity">
+
+
+        <android.support.percent.PercentRelativeLayout
+            android:id="@+id/head"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="#29b6f6"
+            app:layout_heightPercent="8%"
+            app:layout_widthPercent="100%">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="首 页"
+                android:id="@+id/textView"
+                android:layout_centerInParent="true"
+                android:layout_centerHorizontal="true"
+                android:textSize="16sp"
+                android:textColor="@android:color/white"/>
+
+            <ImageButton
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:id="@+id/add_btn"
+                app:layout_heightPercent="55%"
+                app:layout_widthPercent="8%"
+                android:src="@drawable/add_btn"
+                android:background="#00000000"
+                android:scaleType="fitXY"
+                app:layout_marginLeftPercent="4%"
+                app:layout_marginTopPercent="22%"
+                android:onClick="doAdd"/>
+
+            <ImageButton
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:id="@+id/msg_btn2"
+                app:layout_heightPercent="60%"
+                app:layout_widthPercent="8%"
+                android:src="@drawable/msg_btn"
+                android:background="#00000000"
+                android:scaleType="fitXY"
+                app:layout_marginLeftPercent="87%"
+                app:layout_marginTopPercent="22%"
+                android:onClick="doMsg"/>
+
+            <com.ld.qmwj.view.BadgeView
+                android:id="@+id/badgeView"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_heightPercent="30%"
+                app:layout_widthPercent="6%"
+                app:layout_marginLeftPercent="92%"
+                app:layout_marginTopPercent="10%"/>
+
+        </android.support.percent.PercentRelativeLayout>
+
+        <android.support.percent.PercentRelativeLayout
+            android:id="@+id/content"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="#ffffff"
+            app:layout_heightPercent="84%"
+            app:layout_marginTopPercent="8%"
+            app:layout_widthPercent="100%"
+
+            />
+
+        <android.support.percent.PercentRelativeLayout
+            android:id="@+id/bottom"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_alignParentBottom="true"
+            android:background="#f9f9f9"
+            app:layout_heightPercent="8%"
+            app:layout_widthPercent="100%">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_alignParentTop="true"
+                android:background="#eeeeee" />
+
+            <RadioGroup
+                android:id="@+id/radio_group"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:orientation="horizontal"
+                app:layout_heightPercent="100%"
+                app:layout_widthPercent="100%">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1" />
+
+                <RadioButton
+                    android:id="@+id/msg_btn"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="6dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/msg_btn_bg"
+                    android:button="@null"
+                    android:checked="true"
+                    android:gravity="center"
+                    android:scaleType="fitXY" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="2.5" />
+
+                <RadioButton
+                    android:id="@+id/map_btn"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="6dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/map_btn_bg"
+                    android:button="@null"
+                    android:scaleType="fitXY" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="2.5" />
+
+                <RadioButton
+                    android:id="@+id/phone_btn"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="6dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/phone_btn_bg"
+                    android:button="@null"
+                    android:scaleType="fitXY" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1" />
+
+            </RadioGroup>
+        </android.support.percent.PercentRelativeLayout>
+
+    </android.support.percent.PercentRelativeLayout>
+
 
 </RelativeLayout>

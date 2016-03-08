@@ -7,7 +7,9 @@ import com.ld.qmwj.Config;
 import com.ld.qmwj.MyApplication;
 import com.ld.qmwj.client.MsgHandle;
 import com.ld.qmwj.message.HeartMessage;
+import com.ld.qmwj.message.MessageTag;
 import com.ld.qmwj.message.request.LoginRequest;
+import com.ld.qmwj.message.request.Request;
 import com.ld.qmwj.model.User;
 
 import io.netty.buffer.ByteBuf;
@@ -53,16 +55,19 @@ public class SendMessageUtil {
             loginRequest.password = password;
         }
 
-
-        String msg = gson.toJson(loginRequest) + "#";
-        ByteBuf msgbuf = Unpooled.copiedBuffer(msg.getBytes());
-        Log.d(Config.TAG, "准备发送消息给服务器");
-        if (MsgHandle.getInstance().channel != null) {
-            Log.d(Config.TAG, "发送消息给服务器");
-            MsgHandle.getInstance().channel.writeAndFlush(msgbuf);
-        }
+        sendMessageToServer(gson.toJson(loginRequest));
     }
 
+    /**
+     * 发送请求位置请求
+     */
+    public void sendLocationRequest(int user_id,int monitor_id){
+        Request request=new Request();
+        request.tag= MessageTag.LOCATION_REQ;
+        request.from_id=user_id;
+        request.into_id=monitor_id;
+        sendMessageToServer(gson.toJson(request));
+    }
 
     /**
      * 发送心跳消息
@@ -70,5 +75,18 @@ public class SendMessageUtil {
     public void sendHeartMessage() {
         ByteBuf msgbuf = Unpooled.copiedBuffer(heartMessage.getBytes());
         MsgHandle.getInstance().channel.writeAndFlush(msgbuf);
+    }
+
+    /**
+     * 发送消息到服务器
+     */
+    public void sendMessageToServer(String msg){
+        Log.d(Config.TAG, "发送:"+msg);
+        msg+="#";
+        ByteBuf msgbuf = Unpooled.copiedBuffer(msg.getBytes());
+        if (MsgHandle.getInstance().channel != null) {
+            Log.d(Config.TAG, "发送请求位置请求");
+            MsgHandle.getInstance().channel.writeAndFlush(msgbuf);
+        }
     }
 }

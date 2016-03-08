@@ -14,6 +14,8 @@ import com.ld.qmwj.message.response.Response;
 import com.ld.qmwj.util.HandlerUtil;
 import com.ld.qmwj.util.SharePreferenceUtil;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.util.HashMap;
 
 import io.netty.channel.ChannelHandlerContext;
@@ -26,10 +28,14 @@ public class MsgHandle {
     public static MsgHandle msgHandle;
     public ChannelHandlerContext channel;     //与服务器连接的通道
 
-    private Handler handler;          //主线程handle 用于分发消息
+   // private Handler handler;          //主线程handle 用于分发消息
+    private MsgHandle_Control msgHandle_control;
+    private MsgHandle_Under msgHandle_under;
 
     private MsgHandle() {
         gson = new Gson();
+        msgHandle_control=new MsgHandle_Control(gson);
+        msgHandle_under=new MsgHandle_Under(gson);
 
     }
 
@@ -40,9 +46,7 @@ public class MsgHandle {
         return msgHandle;
     }
 
-    public void initHandle(Handler handler) {
-        this.handler = handler;
-    }
+
 
     /**
      * 处理服务器发来的请求
@@ -57,8 +61,16 @@ public class MsgHandle {
                 break;
             case MessageTag.HEART_MSG:
                 //发送心跳消息
-                Log.d(Config.TAG,"收到心跳消息");
+                Log.d(Config.TAG, "收到心跳消息");
                 MyApplication.getInstance().getSendMsgUtil().sendHeartMessage();
+                break;
+            case MessageTag.LOCATION_REQ:
+                //位置请求
+                msgHandle_under.handleLocation(msgJson);
+                break;
+            case MessageTag.LOCATION_RES:
+                //位置响应
+                msgHandle_control.handleLocation(msgJson);
                 break;
         }
     }
@@ -69,22 +81,21 @@ public class MsgHandle {
      */
     private void handleLogin(String msgJson) {
         LoginResponse loginRes = gson.fromJson(msgJson, LoginResponse.class);
-        Message msg = Message.obtain();
+        int tag;        //消息标识
         if (loginRes.isSuccess) {
             //将监护列表写入数据库中
             RefreshListRes refreshListRes=loginRes.refreshListRes;
             if(refreshListRes!=null){
                 MyApplication.getInstance().getRelateDao().addList(refreshListRes.monitorList);
             }
-            msg.what = HandlerUtil.LOGIN_SUCCESS;
+            tag = HandlerUtil.LOGIN_SUCCESS;
             SharePreferenceUtil spUtil = MyApplication.getInstance().getSpUtil();
             spUtil.writeUser(loginRes.user);
         } else {
-            msg.what = HandlerUtil.LOGIN_FAIL;
+            tag = HandlerUtil.LOGIN_FAIL;
         }
 
-        if(handler!=null)
-            handler.sendMessage(msg);
+        EventBus.getDefault().post(tag);
     }
 
 
