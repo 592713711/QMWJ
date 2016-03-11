@@ -69,6 +69,7 @@ import com.baidu.mapapi.search.route.WalkingRouteResult;
 import com.ld.qmwj.Config;
 import com.ld.qmwj.MyApplication;
 import com.ld.qmwj.R;
+import com.ld.qmwj.client.MsgHandle;
 import com.ld.qmwj.model.Monitor;
 import com.ld.qmwj.model.MyLocation;
 import com.ld.qmwj.util.HandlerUtil;
@@ -93,7 +94,7 @@ public class MapFragment extends Fragment implements View.OnClickListener {
     private LocationClient mLocationClient;
 
     //private double mCurrentlatitude=28.138352;         //对方当前位置的纬度
-   // private double mCurrentlongitude=113.000691;        //对方当前经度
+    // private double mCurrentlongitude=113.000691;        //对方当前经度
     private MyLocation mLocation;
 
     private BitmapDescriptor mLocationIcon; //定位的图标
@@ -141,12 +142,15 @@ public class MapFragment extends Fragment implements View.OnClickListener {
                     waitDialog.dismiss();
                 }
                 Toast.makeText(MyApplication.getInstance(), "查找路线，请检查网络", Toast.LENGTH_SHORT).show();
-            }else if(msg.what==HandlerUtil.REQUEST_ERROR){
-
+            } else if (msg.what == HandlerUtil.REQUEST_ERROR) {
                 if (waitDialog != null) {
                     waitDialog.dismiss();
                 }
-                Toast.makeText(MyApplication.getInstance(), "对方网路问题，无法得到位置", Toast.LENGTH_SHORT).show();
+
+                if (MsgHandle.getInstance().channel == null)
+                    Toast.makeText(MyApplication.getInstance(), "当前网路问题，无法得到位置", Toast.LENGTH_SHORT).show();
+                else
+                    Toast.makeText(MyApplication.getInstance(), "未能得到位置，请联系客服", Toast.LENGTH_SHORT).show();
             }
         }
     };
@@ -167,8 +171,6 @@ public class MapFragment extends Fragment implements View.OnClickListener {
         initData();
 
     }
-
-
 
 
     @Override
@@ -221,7 +223,7 @@ public class MapFragment extends Fragment implements View.OnClickListener {
         //缩放的比例，缩放是很难按准备的比例进行缩放的，其值表明缩放的倍数，SDK中建议其值是2的指数值,值越大会导致图片不清晰
         opts.inSampleSize = 1;
         Bitmap bmp = null;
-        bmp = BitmapFactory.decodeResource(getResources(),R.drawable.location_icon);
+        bmp = BitmapFactory.decodeResource(getResources(), R.drawable.location_icon);
         mLocationIcon = BitmapDescriptorFactory.fromBitmap(bmp);
 
         //初始化路线
@@ -230,7 +232,7 @@ public class MapFragment extends Fragment implements View.OnClickListener {
                 .setOnGetRoutePlanResultListener(routePlanResultListener);
 
         //先加载数据库中的位置
-        mLocation=MyApplication.getInstance().getRelateDao().getLocation(monitor.id);
+        mLocation = MyApplication.getInstance().getRelateDao().getLocation(monitor.id);
 
 
     }
@@ -283,12 +285,12 @@ public class MapFragment extends Fragment implements View.OnClickListener {
 
         head_layout = (RelativeLayout) view.findViewById(R.id.head);
         bottom_layout = (RelativeLayout) view.findViewById(R.id.bottom);
-        bottom_layout2= (RelativeLayout) view.findViewById(R.id.bottom2);
+        bottom_layout2 = (RelativeLayout) view.findViewById(R.id.bottom2);
         head_layout.setVisibility(View.GONE);
         bottom_layout.setVisibility(View.GONE);
 
-        location_time= (TextView) view.findViewById(R.id.location_time);
-        location_message2= (TextView) view.findViewById(R.id.location_text2);
+        location_time = (TextView) view.findViewById(R.id.location_time);
+        location_message2 = (TextView) view.findViewById(R.id.location_text2);
 
         ImageButton mark_btn = (ImageButton) view.findViewById(R.id.mark_btn);
         mark_btn.setOnClickListener(this);
@@ -300,6 +302,16 @@ public class MapFragment extends Fragment implements View.OnClickListener {
         back_btn.setOnClickListener(this);
         ImageButton refresh_btn = (ImageButton) view.findViewById(R.id.refresh_btn);
         refresh_btn.setOnClickListener(this);
+
+        ImageButton way_btn= (ImageButton)view. findViewById(R.id.way_btn);
+        way_btn.setOnClickListener(this);
+
+        ImageButton goto_btn= (ImageButton)view. findViewById(R.id.goto_btn);
+        goto_btn.setOnClickListener(this);
+
+        ImageButton protect_btn= (ImageButton)view. findViewById(R.id.protect_btn);
+        protect_btn.setOnClickListener(this);
+
 
     }
 
@@ -313,14 +325,14 @@ public class MapFragment extends Fragment implements View.OnClickListener {
             // 反地理编码查询结果回调函数     通过坐标得到 地理信息
             @Override
             public void onGetReverseGeoCodeResult(ReverseGeoCodeResult result) {
-                String msg=null;
+                String msg = null;
                 if (result == null
                         || result.error != SearchResult.ERRORNO.NO_ERROR) {
                     // 没有检测到结果
-                    msg="抱歉，未能找到结果";
+                    msg = "抱歉，未能找到结果";
                 }
-                if(bottom_layout.getVisibility()==View.VISIBLE){
-                    if(msg!=null) {
+                if (bottom_layout.getVisibility() == View.VISIBLE) {
+                    if (msg != null) {
                         location_message.setText(msg);
                         return;
                     }
@@ -328,8 +340,8 @@ public class MapFragment extends Fragment implements View.OnClickListener {
 
                 }
 
-                if(bottom_layout2.getVisibility()==View.VISIBLE){
-                    if(msg!=null) {
+                if (bottom_layout2.getVisibility() == View.VISIBLE) {
+                    if (msg != null) {
                         location_message2.setText(msg);
                         return;
                     }
@@ -359,18 +371,18 @@ public class MapFragment extends Fragment implements View.OnClickListener {
     }
 
 
-
     /**
      * 将地图移动到当前位置的中心点
      */
     private void centerToMyPosition() {
-        if(mLocation.latitude==0&&mLocation.longitude==0)
+        mBaidumap.clear();
+        if (mLocation.latitude == 0 && mLocation.longitude == 0)
             return;
-      MyLocationData data = new MyLocationData.Builder()
-              .direction(mCurrentx)
+        MyLocationData data = new MyLocationData.Builder()
+                .direction(mCurrentx)
                 .latitude(mLocation.latitude)
                 .longitude(mLocation.longitude)
-              .build();
+                .build();
 
         // 设置当前位置定位数据
         mBaidumap.setMyLocationData(data);
@@ -381,7 +393,7 @@ public class MapFragment extends Fragment implements View.OnClickListener {
         mBaidumap.setMyLocationConfigeration(config);
 
         //LatLng latLng = new LatLng(28.138451,113.000645);
-        LatLng latLng = new LatLng(mLocation.latitude,mLocation.longitude);
+        LatLng latLng = new LatLng(mLocation.latitude, mLocation.longitude);
         MapStatusUpdate msu = MapStatusUpdateFactory.newLatLng(latLng);   //设置位置（经度和纬度）
         mBaidumap.animateMapStatus(msu);      //使用动画的方式更新地图  不是瞬间跳到当前的位置 而是有个动画移动的效果
 
@@ -392,10 +404,10 @@ public class MapFragment extends Fragment implements View.OnClickListener {
         location_time.setText(TimeUtil.getTimeStr((long) mLocation.time, System.currentTimeMillis()) + "他(她)在：");
     }
 
-    public void requestPosition(){
+    public void requestPosition() {
         //请求对方
         MyApplication.getInstance().getSendMsgUtil().sendLocationRequest(
-                MyApplication.getInstance().getSpUtil().getUser().id,monitor.id);
+                MyApplication.getInstance().getSpUtil().getUser().id, monitor.id);
 
         //等待对话框
         waitDialog.setMsg("请求位置中...");
@@ -465,24 +477,26 @@ public class MapFragment extends Fragment implements View.OnClickListener {
     public void onResume() {
         super.onResume();
         //在activity执行onResume时执行mMapView. onResume ()，实现地图生命周期管理
-        Log.d(Config.TAG,"onResume");
+        Log.d(Config.TAG, "onResume");
         mMapView.onResume();
 
     }
 
-    private boolean isFirst=true;
+    private boolean isFirst = true;
+
     /**
      * 隐藏/显示 状态切换时触发
+     *
      * @param hidden
      */
     @Override
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
         //第一次显示时请求位置
-        if(!hidden&&isFirst) {
+        if (!hidden && isFirst) {
             //请求位置
             requestPosition();
-            isFirst=false;
+            isFirst = false;
         }
 
     }
@@ -540,10 +554,11 @@ public class MapFragment extends Fragment implements View.OnClickListener {
     /**
      * 更新对方当前位置
      */
-    public void updateLocation(MyLocation location){
-        mLocation=location;
+    public void updateLocation(MyLocation location) {
+        mLocation = location;
         centerToMyPosition();
     }
+
     /**
      * 地图点击监听器
      */
@@ -600,6 +615,16 @@ public class MapFragment extends Fragment implements View.OnClickListener {
                 more_btn.setChecked(false);
                 requestPosition();
                 break;
+            case R.id.way_btn:
+                more_btn.setChecked(false);
+                break;
+            case R.id.goto_btn:
+                more_btn.setChecked(false);
+                break;
+            case R.id.protect_btn:
+                more_btn.setChecked(false);
+                break;
+
         }
     }
 
@@ -750,7 +775,7 @@ public class MapFragment extends Fragment implements View.OnClickListener {
         });
         mInfoWindow = new InfoWindow(v, selectLatLng, -47);
         //显示InfoWindow
-       // mBaidumap.showInfoWindow(mInfoWindow);
+        // mBaidumap.showInfoWindow(mInfoWindow);
 
     }
 }
