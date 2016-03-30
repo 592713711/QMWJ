@@ -33,9 +33,7 @@ public class WelcomeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome);
-
         handler.postDelayed(startRunnable, 2000);
-
     }
 
 
@@ -66,17 +64,11 @@ public class WelcomeActivity extends AppCompatActivity {
             startActivity(intent);
         }
 
-
         finish();
     }
 
 
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        handler.removeCallbacks(startRunnable);
-        startHomeActivity();
-        return super.onTouchEvent(event);
-    }
+
 
 
 }

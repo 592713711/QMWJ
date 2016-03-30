@@ -2,11 +2,13 @@ package control.home;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.ld.qmwj.Config;
 import com.ld.qmwj.R;
 import com.ld.qmwj.model.Monitor;
 import com.ld.qmwj.view.BadgeView;
@@ -61,6 +63,14 @@ public class RcAdapter extends RecyclerView.Adapter {
             myholder.name.setText(monitor.username);
         else
             myholder.name.setText(monitor.remark_name);
+
+        if (monitor.state == 1) {
+            //离线状态
+            myholder.head_btn.setAlpha(0.5f);
+        } else {
+            //在线状态
+            myholder.head_btn.setAlpha(1f);
+        }
     }
 
     @Override

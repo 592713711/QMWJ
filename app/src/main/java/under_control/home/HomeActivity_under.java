@@ -1,13 +1,22 @@
 package under_control.home;
 
+import android.annotation.TargetApi;
 import android.app.ActivityManager;
-import android.content.ComponentName;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
+
+import android.content.CursorLoader;
 import android.content.Intent;
-import android.content.ServiceConnection;
-import android.os.IBinder;
+
+import android.database.Cursor;
+import android.os.Build;
+
+import android.provider.CallLog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Window;
+import android.view.WindowManager;
 
 import com.ashokvarma.bottomnavigation.BottomNavigationBar;
 import com.ashokvarma.bottomnavigation.BottomNavigationItem;
@@ -15,12 +24,22 @@ import com.ld.qmwj.Config;
 import com.ld.qmwj.MyApplication;
 import com.ld.qmwj.R;
 import com.ld.qmwj.dao.AuthDao;
-import com.ld.qmwj.model.Contacts;
+import com.ld.qmwj.model.Monitor;
 import com.ld.qmwj.model.User;
+import com.ld.qmwj.util.HandlerUtil;
+import com.ld.qmwj.util.PhoneUtils;
+import com.readystatesoftware.systembartint.SystemBarTintManager;
 
-import java.lang.reflect.Array;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
+
+import control.msg.MsgFragment;
 import under_control.home.service.FuctionService;
 import under_control.home.service.LocationService;
 
@@ -28,15 +47,21 @@ public class HomeActivity_under extends AppCompatActivity {
     MyApplication myApplication;
     User user;
     private BottomNavigationBar bottomNavigationBar;        //底部导航
+    private MsgFragment msgFragment;
+    private FragmentManager fm;
+    private FragmentTransaction transaction;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home2);
+        initWindow();
         myApplication=MyApplication.getInstance();
+
         initData();
         //开启服务和广播
         openService();
         initBottom();
+
 
     }
 
@@ -86,6 +111,38 @@ public class HomeActivity_under extends AppCompatActivity {
 
     private void initData() {
         user=myApplication.getSpUtil().getUser();
+
+       // mapFragment = new MapFragment(monitor, this);
+        ArrayList<Monitor> monitors=MyApplication.getInstance().getRelateDao().getList();
+        msgFragment = new MsgFragment(monitors.get(0),this);
+       // phoneFragment = new PhoneFragment(monitor, this);
+        fm = getFragmentManager();
+        transaction = fm.beginTransaction();
+      //  transaction.add(R.id.content, mapFragment);
+        transaction.add(R.id.content, msgFragment);
+      //  transaction.add(R.id.content, phoneFragment);
+        transaction.commit();
+
+        changeFragment(0);
+    }
+
+    /**
+     * 根据选择的按钮 切换显示的碎片
+     *
+     * @param position
+     */
+    private void changeFragment(int position) {
+        transaction = fm.beginTransaction();
+        transaction.hide(msgFragment);
+       // transaction.hide(mapFragment);
+       // transaction.hide(phoneFragment);
+        switch (position) {
+            case 0:
+           //     title_text.setText(monitor.remark_name);
+                transaction.show(msgFragment);
+                transaction.commit();
+                break;
+        }
     }
 
     private void openService() {
@@ -136,5 +193,36 @@ public class HomeActivity_under extends AppCompatActivity {
         }
         return false;
     }
+
+
+
+
+    /**
+     * 初始化通知栏颜色
+     */
+    private void initWindow() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            setTranslucentStatus(true);
+        }
+
+        SystemBarTintManager tintManager = new SystemBarTintManager(this);
+        tintManager.setStatusBarTintEnabled(true);
+        tintManager.setStatusBarTintResource(R.color.statusbar_bg);//通知栏所需颜色
+
+    }
+
+    @TargetApi(19)
+    private void setTranslucentStatus(boolean on) {
+        Window win = getWindow();
+        WindowManager.LayoutParams winParams = win.getAttributes();
+        final int bits = WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS;
+        if (on) {
+            winParams.flags |= bits;
+        } else {
+            winParams.flags &= ~bits;
+        }
+        win.setAttributes(winParams);
+    }
+
 
 }

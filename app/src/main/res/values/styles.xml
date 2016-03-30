@@ -21,4 +21,28 @@
         <!-- 背景透明 -->
 
     </style>
+
+    <style name="dateStyle">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">fill_parent</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="MyTabLayoutTextAppearance" parent="TextAppearance.AppCompat.Widget.ActionBar.Title">
+        <item name="android:textSize">17sp</item>
+    </style>
+
+
+    <!-- 字体样式 start -->
+    <style name="chat_date_style">
+        <item name="android:textColor">#F5F5F5</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:paddingTop">2dp</item>
+        <item name="android:paddingBottom">2dp</item>
+        <item name="android:paddingLeft">8dp</item>
+        <item name="android:paddingRight">8dp</item>
+        <item name="android:layout_gravity">center</item>
+    </style>
 </resources>

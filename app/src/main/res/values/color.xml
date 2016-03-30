@@ -1,4 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="statusbar_bg">#29b6f6</color>
+    <color name="linkman_bar_bg">#f0f0f0</color>
+    <color name="white">#ffffff</color>
+    <color name="canlendar_text_color">#323232</color>
+
+
+    <!-- for main text color theme -->
+    <color name="red">#D95238</color>
+    <color name="color_333333">#333333</color>
+    <color name="color_666666">#666666</color>
+    <color name="color_999999">#999999</color>
+
+    <color name="heart_default">#E48674</color>
+    <color name="heart_select">#E48674</color>
+
+    <color name="translucent">#10000000</color>
+
+    <color name="rippelColor">#FFFFFF</color>
+    <color name="heartbeat">#EAAD7E</color>
+
+    <color name="r">#66ff0000</color>
+    <color name="g">#6600ff00</color>
+    <color name="b">#660000ff</color>
 </resources>

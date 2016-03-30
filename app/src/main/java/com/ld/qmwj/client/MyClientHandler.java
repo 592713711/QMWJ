@@ -4,6 +4,9 @@ import android.util.Log;
 
 import com.ld.qmwj.Config;
 import com.ld.qmwj.MyApplication;
+import com.ld.qmwj.util.HandlerUtil;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.concurrent.TimeUnit;
 
@@ -35,7 +38,12 @@ public class MyClientHandler extends SimpleChannelInboundHandler<String> {
         Log.d(Config.TAG, "连接上服务器");
         super.channelActive(ctx);
         MsgHandle.getInstance().channel = ctx;
+        // 发送自动登录消息
         MyApplication.getInstance().getSendMsgUtil().sendLoginRequest(null,null);
+        //发送缓存表消息
+        MyApplication.getInstance().getSendMsgUtil().sendCache();
+        //发送给主线程 连接成功
+        EventBus.getDefault().postSticky(HandlerUtil.CONNECT_SUC);
     }
 
     @Override
@@ -52,6 +60,8 @@ public class MyClientHandler extends SimpleChannelInboundHandler<String> {
             }
         }, 2, TimeUnit.SECONDS);
         ctx.close();
+        //发送个主线程 连接断开
+        EventBus.getDefault().postSticky(HandlerUtil.CONNECT_FAIL);
     }
 
 }

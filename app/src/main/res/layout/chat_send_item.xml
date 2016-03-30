@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#00000000"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+
+        <com.zhy.android.percent.support.PercentRelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true">
+
+            <TextView
+                android:id="@+id/chat_createDate"
+                style="@style/chat_date_style"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_centerHorizontal="true"
+                android:background="@drawable/roundshape"
+                android:text="03-25 23:02"
+                />
+
+            <com.ld.qmwj.view.CircleImageView
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_below="@+id/chat_createDate"
+                android:id="@+id/chat_icon"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="10dp"
+                android:src="@drawable/h1"
+                app:layout_marginRightPercent="2%w"/>
+
+            <TextView
+                android:id="@+id/chat_content"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/chat_send_bg2"
+                android:clickable="true"
+                android:text="好的"
+                android:textColor="#ffffff"
+                android:gravity="center_vertical"
+                android:textSize="16sp"
+                android:layout_alignTop="@+id/chat_icon"
+                android:layout_toStartOf="@+id/chat_icon"
+                app:layout_marginLeftPercent="10%w"
+                android:layout_marginBottom="10dp"
+                />
+
+        </com.zhy.android.percent.support.PercentRelativeLayout>
+
+    </RelativeLayout>
+</RelativeLayout>

@@ -22,6 +22,29 @@ public class MessageTag {
     public static final int LOCATION_REQ=5;
     public static final int LOCATION_RES=6;
 
+    // 用户在线/离线标识
+    public static final int ONLINE = 7;
+    public static final int NOT_ONLINE = 8;
+
+    //请求历史路线标识
+    public static final int OLDWAY_REQ_ALL=9;
+    public static final int OLDWAY_REQ=10;
+    public static final int OLDWAY_RES=11;
+
+    //通话记录响应
+    public static final int CALLPHONE_RES=12;
+
+
+    //请求对方所有联系人
+    public static final int LINKMAN_REQ=13;
+    public static final int LINKMAN_RES=14;
+    public static final int ADDLINKMAN_REQ=15;
+
+    //聊天信息
+    public static final int CHAT_REQ=16;
+
+    //短信响应
+    public static final int SMS_RES=17;
 
 }
 

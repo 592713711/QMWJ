@@ -12,6 +12,8 @@ import com.ld.qmwj.message.request.LoginRequest;
 import com.ld.qmwj.message.request.Request;
 import com.ld.qmwj.model.User;
 
+import java.util.ArrayList;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -78,15 +80,47 @@ public class SendMessageUtil {
     }
 
     /**
-     * 发送消息到服务器
+     * 发送实时消息到服务器
      */
     public void sendMessageToServer(String msg){
         Log.d(Config.TAG, "发送:"+msg);
         msg+="#";
         ByteBuf msgbuf = Unpooled.copiedBuffer(msg.getBytes());
         if (MsgHandle.getInstance().channel != null) {
-            Log.d(Config.TAG, "发送请求位置请求");
             MsgHandle.getInstance().channel.writeAndFlush(msgbuf);
         }
+    }
+
+    /**
+     * 发送非实时消息到服务器
+     * @param msg
+     */
+    public void sendCacheMessageToServer(String msg){
+        Log.d(Config.TAG, "发送非及时消息:"+msg);
+        String msg2=msg+"#";
+        ByteBuf msgbuf = Unpooled.copiedBuffer(msg2.getBytes());
+        if (MsgHandle.getInstance().channel != null) {
+            MsgHandle.getInstance().channel.writeAndFlush(msgbuf);
+        }else{
+            //放入缓存表中
+            Log.d(Config.TAG,"未连接服务器，放入缓存表中");
+            MyApplication.getInstance().getCacheDao().insertCacheMsg(msg);
+        }
+    }
+
+    /**
+     * 发送缓存表的信息
+     */
+    public void sendCache(){
+
+        if(MyApplication.getInstance().getSpUtil().getUser()!=null) {
+            //已登录
+            ArrayList<String> msgs = MyApplication.getInstance().getCacheDao().getAllCacheMsg();
+            for (String s : msgs) {
+                Log.d(Config.TAG, "发送缓存消息：" + s);
+                sendCacheMessageToServer(s);
+            }
+        }
+
     }
 }

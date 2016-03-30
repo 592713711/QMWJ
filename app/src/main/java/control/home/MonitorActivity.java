@@ -3,6 +3,7 @@ package control.home;
 import android.annotation.TargetApi;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
@@ -19,8 +20,11 @@ import android.view.animation.AnimationUtils;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.ashokvarma.bottomnavigation.BottomNavigationBar;
+import com.ashokvarma.bottomnavigation.BottomNavigationItem;
 import com.ld.qmwj.Config;
 import com.ld.qmwj.MyApplication;
 import com.ld.qmwj.R;
@@ -45,15 +49,16 @@ import control.phone.PhoneFragment;
  */
 public class MonitorActivity extends AppCompatActivity {
     private Monitor monitor;
-    private RadioButton msg_btn;
-    private RadioButton phone_btn;
-    private RadioButton map_btn;
-    private RadioGroup radioGroup;
     private MapFragment mapFragment;
     private MsgFragment msgFragment;
     private PhoneFragment phoneFragment;
-    FragmentManager fm;
-    FragmentTransaction transaction;
+    private FragmentManager fm;
+    private FragmentTransaction transaction;
+    private RelativeLayout hintLayout;      //提示布局
+    private TextView hintMessage;           //提示内容
+    private TextView title_text;            //标题
+    private BottomNavigationBar bottomNavigationBar;        //底部导航
+
 
     public Handler handler = new Handler();
 
@@ -64,25 +69,65 @@ public class MonitorActivity extends AppCompatActivity {
         monitor = (Monitor) getIntent().getSerializableExtra("monitor");
         initWindow();
         initView();
+        initBottom();
         //订阅事件
         EventBus.getDefault().register(this);
     }
 
-    private void initView() {
-        msg_btn = (RadioButton) findViewById(R.id.msg_btn);
-        map_btn = (RadioButton) findViewById(R.id.map_btn);
-        phone_btn = (RadioButton) findViewById(R.id.phone_btn);
-        radioGroup = (RadioGroup) findViewById(R.id.radio_group);
-        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+
+    /**
+     * 初始化底部导航栏
+     */
+    private void initBottom() {
+
+        bottomNavigationBar = (BottomNavigationBar) findViewById(R.id.bottom);
+
+
+        bottomNavigationBar
+                .setBackgroundStyle(BottomNavigationBar.BACKGROUND_STYLE_STATIC);
+
+        bottomNavigationBar
+                .setMode(BottomNavigationBar.MODE_DEFAULT);
+
+        bottomNavigationBar
+                .setActiveColor("#29b6f6")
+                .setInActiveColor("#a0a0a0")
+                .setBarBackgroundColor("#fafafa");
+
+        bottomNavigationBar
+                .addItem(new BottomNavigationItem(R.drawable.msg_btn_1, "信息"))
+                .addItem(new BottomNavigationItem(R.drawable.map_btn_1, "定位"))
+                .addItem(new BottomNavigationItem(R.drawable.phone_btn_1, "手机"))
+                .initialise();
+
+
+        bottomNavigationBar.setTabSelectedListener(new BottomNavigationBar.OnTabSelectedListener() {
             @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                changeFragment(checkedId);
+            public void onTabSelected(int position) {
+                changeFragment(position);
+            }
+
+            @Override
+            public void onTabUnselected(int position) {
+
+            }
+
+            @Override
+            public void onTabReselected(int position) {
             }
         });
+    }
+
+    private void initView() {
+        title_text = (TextView) findViewById(R.id.title);
+        hintLayout = (RelativeLayout) findViewById(R.id.hint);
+        hintMessage = (TextView) findViewById(R.id.hintmsg);
+        updateHint();
+
 
         mapFragment = new MapFragment(monitor, this);
-        msgFragment = new MsgFragment(monitor);
-        phoneFragment = new PhoneFragment(monitor);
+        msgFragment = new MsgFragment(monitor,this);
+        phoneFragment = new PhoneFragment(monitor, this);
         fm = getFragmentManager();
         transaction = fm.beginTransaction();
         transaction.add(R.id.content, mapFragment);
@@ -90,41 +135,90 @@ public class MonitorActivity extends AppCompatActivity {
         transaction.add(R.id.content, phoneFragment);
         transaction.commit();
 
-        changeFragment(R.id.msg_btn);
+        changeFragment(0);
+
+
 
 
     }
 
 
+    private Boolean isStart = false;         //该活动是否在显示
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        isStart = true;
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        isStart = false;
+    }
+
     /**
      * 根据选择的按钮 切换显示的碎片
      *
-     * @param checkedId
+     * @param position
      */
-    private void changeFragment(int checkedId) {
+    private void changeFragment(int position) {
         transaction = fm.beginTransaction();
         transaction.hide(msgFragment);
         transaction.hide(mapFragment);
         transaction.hide(phoneFragment);
-        switch (checkedId) {
-            case R.id.msg_btn:
+        switch (position) {
+            case 0:
+                title_text.setText(monitor.remark_name);
                 transaction.show(msgFragment);
                 transaction.commit();
                 break;
-            case R.id.map_btn:
+            case 1:
+                title_text.setText("位 置");
                 transaction.show(mapFragment);
                 transaction.commit();
                 break;
-            case R.id.phone_btn:
+            case 2:
+                title_text.setText("管 理");
                 transaction.show(phoneFragment);
                 transaction.commit();
                 break;
         }
     }
 
+    /**
+     * 控制提示框的显示与消失
+     */
+    public void updateHint() {
+        //先判断是否已经连接上了服务器
+        if (MsgHandle.getInstance().channel != null) {
+            hintLayout.setVisibility(View.GONE);
+        } else if (MsgHandle.getInstance().channel == null) {
+            hintMessage.setText("与服务器断开连接，请检查网络");
+            hintLayout.setVisibility(View.VISIBLE);
+            return;
+        }
+
+        //判断对方是否在线
+        if (monitor.state == Config.ONLINE_STATE) {
+            hintLayout.setVisibility(View.GONE);
+        } else if (monitor.state == Config.NOT_ONLINE_STATE) {
+            hintMessage.setText("对方未连接");
+            hintLayout.setVisibility(View.VISIBLE);
+            if (mapFragment != null) {
+                mapFragment.handler.removeMessages(HandlerUtil.REQUEST_ERROR);
+
+                mapFragment.waitDialog.dismiss();
+                if (isStart)
+                    Toast.makeText(this, "对方网络问题，未能获得数据", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }
+    }
 
     public void doQuit(View v) {
         finish();
+
     }
 
     /**
@@ -164,12 +258,19 @@ public class MonitorActivity extends AppCompatActivity {
         if (tag == HandlerUtil.LOCATION_RESPONSE) {
             //收到位置响应
             MyLocation location = MyApplication.getInstance().getRelateDao().getLocation(monitor.id);
-            handler.removeMessages(HandlerUtil.REQUEST_ERROR);
             mapFragment.handler.removeMessages(HandlerUtil.REQUEST_ERROR);
             mapFragment.waitDialog.dismiss();
             Toast.makeText(MonitorActivity.this, "更新了对方位置", Toast.LENGTH_SHORT).show();
             mapFragment.updateLocation(location);
 
+        } else if (tag == HandlerUtil.STATE_RESPONSE) {
+            //更新对方状态
+            monitor = MyApplication.getInstance().getRelateDao().getMonitorById(monitor.id);
+            updateHint();
+        } else if (tag == HandlerUtil.CONNECT_SUC || tag == HandlerUtil.CONNECT_FAIL) {
+            updateHint();
+        }else if (tag == HandlerUtil.CAHT_UPDATE) {
+            msgFragment.initData();
         }
     }
 

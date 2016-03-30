@@ -1,9 +1,89 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" tools:context="control.msg.MsgFragment">
+<com.zhy.android.percent.support.PercentRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="control.msg.MsgFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView android:layout_width="match_parent" android:layout_height="match_parent"
-        android:text="msg" />
 
-</FrameLayout>
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/refreshlayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/input_layout">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycleview_msg"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:background="#eeeeee"
+            android:scrollbars="vertical" />
+
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+    <com.zhy.android.percent.support.PercentRelativeLayout
+        android:id="@+id/input_layout"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:layout_alignParentBottom="true">
+
+        <com.ld.qmwj.view.MyEditText
+            android:id="@+id/input_edit"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_centerVertical="true"
+            android:background="@drawable/input_edit_bg"
+            android:gravity="center_vertical"
+            android:singleLine="true"
+            android:text=""
+            android:textSize="16sp"
+            app:layout_marginLeftPercent="23%"
+            app:layout_widthPercent="60%w" />
+
+
+        <ImageButton
+            android:id="@+id/doSend_btn"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:background="#00000000"
+            android:scaleType="fitXY"
+            android:src="@drawable/send_btn_bg"
+            app:layout_heightPercent="70%h"
+            app:layout_marginRightPercent="2%"
+            app:layout_widthPercent="13%w" />
+
+        <ImageButton
+            android:id="@+id/input_voice_btn"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:background="#00000000"
+            android:scaleType="fitXY"
+            android:src="@drawable/input_voice_btn"
+            app:layout_heightPercent="65%h"
+            app:layout_marginLeftPercent="4%"
+            app:layout_widthPercent="37%h" />
+
+        <ImageButton
+            android:id="@+id/input_add_btn"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_alignBottom="@+id/input_voice_btn"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@+id/input_voice_btn"
+            android:background="#00000000"
+            android:scaleType="fitXY"
+            android:src="@drawable/input_add_btn"
+            app:layout_heightPercent="60%h"
+            app:layout_marginLeftPercent="4%"
+            app:layout_widthPercent="55%h" />
+
+    </com.zhy.android.percent.support.PercentRelativeLayout>
+
+</com.zhy.android.percent.support.PercentRelativeLayout>

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">QMWJ</string>
+    <string name="app_name">亲密无间</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
@@ -9,4 +9,17 @@
 
 <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="sunday">日</string>
+    <string name="monday">一</string>
+    <string name="thesday">二</string>
+    <string name="wednesday">三</string>
+    <string name="thursday">四</string>
+    <string name="friday">五</string>
+    <string name="saturday">六</string>
+    <string name="title_activity_phone_state">PhoneStateActivity</string>
+    <string name="title_activity_health">HealthActivity</string>
+    <string name="title_activity_sms_list">SmsListActivity</string>
+    <string name="title_activity_sms_content">SmsContentActivity</string>
+
 </resources>

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.google.gson.Gson;
+import com.ld.qmwj.Config;
 import com.ld.qmwj.model.User;
 
 /**
@@ -53,4 +54,9 @@ public class SharePreferenceUtil {
             editor.commit();
         }
     }
+
+    public SharedPreferences getSp(){
+        return sp;
+    }
+
 }

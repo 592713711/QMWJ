@@ -1,9 +1,312 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" tools:context="control.phone.PhoneFragment">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#f0f0f0"
+    android:paddingTop="10dp"
+    tools:context="control.phone.PhoneFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView android:layout_width="match_parent" android:layout_height="match_parent"
-        android:text="phone" />
+    <com.zhy.android.percent.support.PercentRelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".MainActivity">
+
+        <com.zhy.android.percent.support.PercentRelativeLayout
+            android:id="@+id/monitor_msg"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@drawable/content_bg"
+            app:layout_heightPercent="15%">
+
+            <ImageView
+                android:id="@+id/headicon_view"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/h1"
+                app:layout_heightPercent="80%h"
+                app:layout_marginLeftPercent="4%"
+                app:layout_widthPercent="80%h" />
+
+            <TextView
+                android:id="@+id/mark_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/headicon_view"
+                android:layout_marginLeft="9dp"
+                android:layout_toEndOf="@+id/headicon_view"
+                android:text="熙熙"
+                android:textColor="#303030"
+                android:textSize="17sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignStart="@+id/mark_name"
+                android:layout_below="@+id/mark_name"
+                android:text="当天步数：2500"
+                android:textSize="13sp"
+                android:layout_marginTop="2dp"/>
+
+            <ImageView
+                android:layout_width="10dp"
+                android:layout_height="13dp"
+                android:src="@drawable/tip_icon"
+                android:layout_centerVertical="true"
+                android:layout_alignParentEnd="true"
+                app:layout_marginRightPercent="8%"
+                />
+
+        </com.zhy.android.percent.support.PercentRelativeLayout>
+
+        <com.zhy.android.percent.support.PercentRelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/monitor_msg"
+            android:id="@+id/function_layout"
+            android:layout_marginTop="-1dp"
+            android:background="@drawable/content_bg"
+            android:paddingBottom="10dp"
+            android:paddingTop="10dp">
+
+            <ImageButton
+                android:id="@+id/linkman_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:background="#00000000"
+                android:scaleType="fitXY"
+                android:src="@drawable/linkman_btn"
+                app:layout_marginLeftPercent="8%" />
+
+            <TextView
+                android:id="@+id/text1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignStart="@+id/linkman_btn"
+                android:layout_below="@+id/linkman_btn"
+                android:layout_marginLeft="1dp"
+                android:layout_marginTop="3dp"
+                android:text="联系人"
+                android:textSize="12sp" />
+
+            <ImageButton
+                android:id="@+id/bluetooth_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:background="#00000000"
+                android:scaleType="fitXY"
+                android:src="@drawable/bluetooth_btn"
+                app:layout_marginRightPercent="8%" />
+
+            <TextView
+                android:id="@+id/text2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignStart="@+id/bluetooth_btn"
+                android:layout_alignTop="@+id/text1"
+                android:layout_below="@+id/bluetooth_btn"
+                android:layout_marginLeft="-5dp"
+                android:singleLine="true"
+                android:text="蓝牙随行"
+                android:textSize="12sp" />
+
+            <ImageButton
+                android:id="@+id/health_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/bluetooth_btn"
+                android:layout_toStartOf="@+id/bluetooth_btn"
+                android:background="#00000000"
+                android:scaleType="fitXY"
+                android:src="@drawable/health_btn"
+                app:layout_marginRightPercent="16%" />
+
+            <TextView
+                android:id="@+id/text3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignStart="@+id/health_btn"
+                android:layout_alignTop="@+id/text1"
+                android:layout_below="@+id/health_btn"
+                android:layout_marginLeft="-5dp"
+                android:singleLine="true"
+                android:text="健康心率"
+                android:textSize="12sp" />
+
+
+            <ImageButton
+                android:id="@+id/sms_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/linkman_btn"
+                android:layout_toEndOf="@+id/linkman_btn"
+                android:background="#00000000"
+                android:scaleType="fitXY"
+                android:src="@drawable/sms_btn"
+                app:layout_marginLeftPercent="16%"
+
+                />
+
+            <TextView
+                android:id="@+id/text4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignStart="@+id/sms_btn"
+                android:layout_alignTop="@+id/text1"
+                android:layout_below="@+id/sms_btn"
+                android:layout_marginLeft="-5dp"
+                android:singleLine="true"
+                android:text="短信监控"
+                android:textSize="12sp" />
+
+            <ImageButton
+                android:id="@+id/setting_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignStart="@+id/linkman_btn"
+                android:layout_below="@+id/text1"
+                android:layout_marginTop="20dp"
+                android:background="#00000000"
+                android:scaleType="fitXY"
+                android:src="@drawable/setting_btn" />
+
+            <TextView
+                android:id="@+id/text5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignStart="@+id/setting_btn"
+                android:layout_below="@+id/setting_btn"
+                android:layout_marginLeft="-5dp"
+                android:layout_marginTop="3dp"
+                android:text="手机设置"
+                android:textSize="12sp" />
+
+            <ImageButton
+                android:id="@+id/clock_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignStart="@+id/sms_btn"
+                android:layout_below="@+id/text4"
+                android:layout_marginTop="20dp"
+                android:background="#00000000"
+                android:scaleType="fitXY"
+                android:src="@drawable/clock_btn" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignStart="@+id/clock_btn"
+                android:layout_alignTop="@+id/text5"
+                android:layout_below="@+id/clock_btn"
+                android:layout_marginLeft="-5dp"
+                android:text="闹钟定时"
+                android:textSize="12sp" />
+
+            <ImageButton
+                android:id="@+id/cost_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignStart="@+id/health_btn"
+                android:layout_below="@+id/text3"
+                android:layout_marginTop="20dp"
+                android:background="#00000000"
+                android:scaleType="fitXY"
+                android:src="@drawable/cost_btn" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignStart="@+id/cost_btn"
+                android:layout_alignTop="@+id/text5"
+                android:layout_below="@+id/cost_btn"
+                android:layout_marginLeft="-5dp"
+                android:text="话费查询"
+                android:textSize="12sp" />
+
+            <ImageButton
+                android:id="@+id/close_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignStart="@+id/bluetooth_btn"
+                android:layout_below="@+id/text2"
+                android:layout_marginTop="20dp"
+                android:background="#00000000"
+                android:scaleType="fitXY"
+                android:src="@drawable/close_btn" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignStart="@+id/close_btn"
+                android:layout_alignTop="@+id/text5"
+                android:layout_below="@+id/close_btn"
+                android:layout_marginLeft="-3dp"
+                android:text="远程关机"
+                android:textSize="12sp" />
+
+        </com.zhy.android.percent.support.PercentRelativeLayout>
+
+        <com.zhy.android.percent.support.PercentRelativeLayout
+            android:id="@+id/unbind_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/function_layout"
+            android:layout_marginTop="15dp"
+            android:background="@drawable/content_bg"
+            android:paddingBottom="10dp"
+            android:paddingTop="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="解除绑定"
+                android:textColor="#303030"
+                android:textSize="17sp"
+                app:layout_marginLeftPercent="8%" />
+
+            <ImageView
+                android:layout_width="10dp"
+                android:layout_height="13dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/tip_icon"
+                app:layout_marginRightPercent="8%" />
+
+        </com.zhy.android.percent.support.PercentRelativeLayout>
+
+        <com.zhy.android.percent.support.PercentRelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/sitting_layout"
+            android:layout_below="@+id/unbind_layout"
+            android:background="@drawable/content_bg"
+            android:layout_marginTop="15dp"
+            android:paddingBottom="10dp"
+            android:paddingTop="10dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="功能监听列表"
+                app:layout_marginLeftPercent="8%"
+                android:layout_centerVertical="true"
+                android:textSize="17sp"
+                android:textColor="#303030"/>
+
+            <ImageView
+                android:layout_width="10dp"
+                android:layout_height="13dp"
+                android:src="@drawable/tip_icon"
+                android:layout_centerVertical="true"
+                android:layout_alignParentEnd="true"
+                app:layout_marginRightPercent="8%"
+                />
+
+        </com.zhy.android.percent.support.PercentRelativeLayout>
+    </com.zhy.android.percent.support.PercentRelativeLayout>
 
 </FrameLayout>

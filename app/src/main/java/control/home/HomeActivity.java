@@ -12,15 +12,22 @@ import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.ld.qmwj.Config;
 import com.ld.qmwj.MyApplication;
 import com.ld.qmwj.R;
+import com.ld.qmwj.client.MsgHandle;
 import com.ld.qmwj.model.Monitor;
+import com.ld.qmwj.util.HandlerUtil;
 import com.ld.qmwj.view.BadgeView;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 
-import java.io.Serializable;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.util.ArrayList;
 
 public class HomeActivity extends AppCompatActivity {
@@ -28,6 +35,8 @@ public class HomeActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     RcAdapter adapter;
     ArrayList<Monitor> list;        //监护列表
+    RelativeLayout hintLayout;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,8 +45,14 @@ public class HomeActivity extends AppCompatActivity {
 
         initWindow();
         initView();
+        //订阅事件
+        EventBus.getDefault().register(this);
+
 
     }
+
+
+
 
     private void initView() {
 
@@ -55,6 +70,8 @@ public class HomeActivity extends AppCompatActivity {
         adapter.setItemOnClickListener(itemClick);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        hintLayout = (RelativeLayout) findViewById(R.id.hint);
+        updateHint();
 
 
     }
@@ -86,6 +103,49 @@ public class HomeActivity extends AppCompatActivity {
             startActivity(intent);
         }
     };
+
+    /**
+     * 更新被监护方列表
+     */
+    public void updateList() {
+        list = MyApplication.getInstance().getRelateDao().getList();
+        Log.d(Config.TAG, list.toString());
+        adapter.updateData(list);
+    }
+
+    /**
+     * 处理传递来的handler消息
+     *
+     * @param tag
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void showInfo(Integer tag) {
+        if (tag == HandlerUtil.STATE_RESPONSE) {
+            //收到对方状态响应
+            updateList();
+        } else if (tag == HandlerUtil.CONNECT_SUC || tag == HandlerUtil.CONNECT_FAIL) {
+            updateHint();
+        }
+    }
+
+    /**
+     * 更新提示消息
+     */
+    public void updateHint() {
+        //判断当前客户端是否已经连接上了服务器
+        if (MsgHandle.getInstance().channel != null) {
+            hintLayout.setVisibility(View.GONE);
+        } else {
+            hintLayout.setVisibility(View.VISIBLE);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        //取消订阅
+        EventBus.getDefault().unregister(this);
+    }
 
     /**
      * 初始化通知栏颜色

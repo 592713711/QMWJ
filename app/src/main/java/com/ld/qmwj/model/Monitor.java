@@ -13,6 +13,7 @@ public class Monitor implements Serializable{
     public String remark_name;        //该对象备注名
     public int status;            //该对象身份
     public int icon;            //记录头像编号
+    public int state;           //用户当前状态
 
     @Override
     public String toString() {
@@ -22,7 +23,7 @@ public class Monitor implements Serializable{
                 ", remark_name='" + remark_name + '\'' +
                 ", status=" + status +
                 ", icon=" + icon +
+                ", state=" + state +
                 '}';
     }
-
 }

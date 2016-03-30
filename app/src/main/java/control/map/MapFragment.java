@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -77,6 +78,7 @@ import com.ld.qmwj.util.TimeUtil;
 import com.ld.qmwj.util.WaitDialog;
 
 import control.home.MonitorActivity;
+import control.map.LiShiLuxian.RouteActivity;
 import control.map.overlayutil.DrivingRouteOverlay;
 import control.map.overlayutil.TransitRouteOverlay;
 import control.map.overlayutil.WalkingRouteOverlay;
@@ -92,10 +94,13 @@ public class MapFragment extends Fragment implements View.OnClickListener {
     private BaiduMap mBaidumap;
 
     private LocationClient mLocationClient;
+    private MyLocationListener myLocationListener;
+
 
     //private double mCurrentlatitude=28.138352;         //对方当前位置的纬度
     // private double mCurrentlongitude=113.000691;        //对方当前经度
-    private MyLocation mLocation;
+    private MyLocation mLocation;           //被监护方位置
+    private LatLng currentLocation;         //当前用户位置
 
     private BitmapDescriptor mLocationIcon; //定位的图标
     private float mCurrentx;             //当前位置 x方向的值
@@ -104,6 +109,7 @@ public class MapFragment extends Fragment implements View.OnClickListener {
     private String city = "广德";       //对方当前位置的城市
     int way_type = 0;         //路线类型  0步行 1小车 2公交
     LatLng selectLatLng = null;       //选择的坐标点
+    private boolean isSelect = false;     //判断是否是点击地图的标志
 
 
     //相关控件
@@ -184,6 +190,17 @@ public class MapFragment extends Fragment implements View.OnClickListener {
     }
 
     private void initData() {
+        //初始化位置定位
+        mLocationClient = new LocationClient(MyApplication.getInstance());
+        myLocationListener = new MyLocationListener();
+        mLocationClient.registerLocationListener(myLocationListener);
+        //初始化定位配置
+        LocationClientOption option = new LocationClientOption();
+        option.setCoorType("bd09ll");       //设置坐标类型
+        option.setIsNeedAddress(true);      //设置true后可以得到位置的地址
+        option.setOpenGps(true);
+        mLocationClient.setLocOption(option);
+
         //方向传感器  需要手动开启和关闭
         myOrientationListener = new MyOrientationListener(MyApplication.getInstance());
         //设置方向传感器回调方法
@@ -264,8 +281,11 @@ public class MapFragment extends Fragment implements View.OnClickListener {
                         way_type = 1;
                         break;
                 }
-
-                searchWay();
+                //判断是点击地图还是到当前位置
+                if (isSelect)
+                    searchWay(selectLatLng);
+                else
+                    searchWay(currentLocation);
             }
         });
 
@@ -303,13 +323,13 @@ public class MapFragment extends Fragment implements View.OnClickListener {
         ImageButton refresh_btn = (ImageButton) view.findViewById(R.id.refresh_btn);
         refresh_btn.setOnClickListener(this);
 
-        ImageButton way_btn= (ImageButton)view. findViewById(R.id.way_btn);
+        ImageButton way_btn = (ImageButton) view.findViewById(R.id.way_btn);
         way_btn.setOnClickListener(this);
 
-        ImageButton goto_btn= (ImageButton)view. findViewById(R.id.goto_btn);
+        ImageButton goto_btn = (ImageButton) view.findViewById(R.id.goto_btn);
         goto_btn.setOnClickListener(this);
 
-        ImageButton protect_btn= (ImageButton)view. findViewById(R.id.protect_btn);
+        ImageButton protect_btn = (ImageButton) view.findViewById(R.id.protect_btn);
         protect_btn.setOnClickListener(this);
 
 
@@ -359,7 +379,7 @@ public class MapFragment extends Fragment implements View.OnClickListener {
                     // 没有检测到结果
                 }
                 selectLatLng = result.getLocation();
-                searchWay();
+                searchWay(selectLatLng);
             }
         };
         // 设置地理编码检索监听者
@@ -429,9 +449,9 @@ public class MapFragment extends Fragment implements View.OnClickListener {
     /**
      * 查找路线
      */
-    private void searchWay() {
+    private void searchWay(LatLng target) {
 
-        if (selectLatLng == null)
+        if (target == null)
             return;
 
         switch (way_type) {
@@ -439,21 +459,21 @@ public class MapFragment extends Fragment implements View.OnClickListener {
                 //查询步行
                 WalkingRoutePlanOption walkOption = new WalkingRoutePlanOption();
                 walkOption.from(PlanNode.withLocation(new LatLng(mLocation.latitude, mLocation.longitude)));// 设置起点
-                walkOption.to(PlanNode.withLocation(selectLatLng));// 设置终点
+                walkOption.to(PlanNode.withLocation(target));// 设置终点
                 routePlanSearch.walkingSearch(walkOption);       // 发起步行路线规划
                 break;
             case 1:
                 //查询小车
                 DrivingRoutePlanOption drivingOption = new DrivingRoutePlanOption();
                 drivingOption.from(PlanNode.withLocation(new LatLng(mLocation.latitude, mLocation.longitude)));// 设置起点
-                drivingOption.to(PlanNode.withLocation(selectLatLng));// 设置终点
+                drivingOption.to(PlanNode.withLocation(target));// 设置终点
                 routePlanSearch.drivingSearch(drivingOption);       // 发起步行路线规划
                 break;
             case 2:
                 //查询公交
                 TransitRoutePlanOption transitOption = new TransitRoutePlanOption();
                 transitOption.from(PlanNode.withLocation(new LatLng(mLocation.latitude, mLocation.longitude)));// 设置起点
-                transitOption.to(PlanNode.withLocation(selectLatLng));// 设置终点
+                transitOption.to(PlanNode.withLocation(target));// 设置终点
                 transitOption.city(city);
                 routePlanSearch.transitSearch(transitOption);       // 发起步行路线规划
                 break;
@@ -532,7 +552,9 @@ public class MapFragment extends Fragment implements View.OnClickListener {
         bottom_layout2.startAnimation(anmi3);
 
         //设置点击地图监听器
+        mBaidumap.clear();
         mBaidumap.setOnMapClickListener(mapClickLis);
+        isSelect = true;
     }
 
     public void doBack() {
@@ -546,6 +568,7 @@ public class MapFragment extends Fragment implements View.OnClickListener {
         Animation anmi3 = AnimationUtils.loadAnimation(monitorActivity, R.anim.bottom_coming);
         bottom_layout2.setVisibility(View.VISIBLE);
         bottom_layout2.startAnimation(anmi3);
+        isSelect = false;
         mBaidumap.setOnMapClickListener(null);
         mBaidumap.clear();
 
@@ -580,7 +603,7 @@ public class MapFragment extends Fragment implements View.OnClickListener {
             // 反地理编码  通过坐标查位置
             geoCoder.reverseGeoCode(new ReverseGeoCodeOption().location(latLng));
             selectLatLng = latLng;
-            searchWay();
+            searchWay(selectLatLng);
 
 //            Log.d(TAG,latLng.toString());
 
@@ -617,15 +640,40 @@ public class MapFragment extends Fragment implements View.OnClickListener {
                 break;
             case R.id.way_btn:
                 more_btn.setChecked(false);
+                Intent intent = new Intent(monitorActivity, RouteActivity.class);
+                intent.putExtra("monitor", monitor);
+                startActivity(intent);
                 break;
             case R.id.goto_btn:
                 more_btn.setChecked(false);
+                doGoto();
                 break;
             case R.id.protect_btn:
                 more_btn.setChecked(false);
                 break;
 
         }
+    }
+
+    /**
+     * 点击到这去按钮
+     */
+    private void doGoto() {
+        mLocationClient.start();
+        isSelect = false;
+        mBaidumap.setOnMapClickListener(null);
+        //动画的方式显示布局文件
+        head_layout.setVisibility(View.VISIBLE);
+        bottom_layout.setVisibility(View.VISIBLE);
+        Animation anmi = AnimationUtils.loadAnimation(monitorActivity, R.anim.head_coming);
+        Animation anmi2 = AnimationUtils.loadAnimation(monitorActivity, R.anim.bottom_coming);
+        head_layout.startAnimation(anmi);
+        bottom_layout.setAnimation(anmi2);
+
+        Animation anmi3 = AnimationUtils.loadAnimation(monitorActivity, R.anim.bottim_out);
+        bottom_layout2.setVisibility(View.GONE);
+        bottom_layout2.startAnimation(anmi3);
+
     }
 
     /**
@@ -673,7 +721,8 @@ public class MapFragment extends Fragment implements View.OnClickListener {
                 TransitRouteResult transitRouteResult) {
             mBaidumap.clear();
             handler.removeMessages(HandlerUtil.SEAECH_ERROR);
-            waitDialog.dismiss();
+            if (waitDialog != null)
+                waitDialog.dismiss();
             if (transitRouteResult == null
                     || transitRouteResult.error != SearchResult.ERRORNO.NO_ERROR) {
                 Toast.makeText(monitorActivity, "抱歉，未找到结果",
@@ -715,7 +764,8 @@ public class MapFragment extends Fragment implements View.OnClickListener {
             mBaidumap.clear();
             handler.removeMessages(HandlerUtil.SEAECH_ERROR);
             waitDialog.dismiss();
-            showSelectDialog();
+            if (isSelect)
+                showSelectDialog();
             if (drivingRouteResult == null
                     || drivingRouteResult.error != SearchResult.ERRORNO.NO_ERROR) {
                 Toast.makeText(monitorActivity, "抱歉，未找到结果",
@@ -777,5 +827,30 @@ public class MapFragment extends Fragment implements View.OnClickListener {
         //显示InfoWindow
         // mBaidumap.showInfoWindow(mInfoWindow);
 
+    }
+
+    /**
+     * 定位监听器
+     */
+    class MyLocationListener implements BDLocationListener {
+
+        @Override
+        public void onReceiveLocation(BDLocation location) {
+            currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
+            location_message.setText("你的位置：" + location.getAddrStr());
+            mLocationClient.stop();
+            //显示路线
+            mBaidumap.clear();      //先清除覆盖物
+            //构造OverlayOptions（地图覆盖物选型基类）
+            OverlayOptions options = new MarkerOptions()
+                    .position(currentLocation)      // 设置marker的位置
+                    .icon(mMarkerIcon)      // 设置marker的图标
+                    .zIndex(5);             // 设置marker的所在层級
+
+            // 在地图上添加marker，并显示
+            marker = (Marker) mBaidumap.addOverlay(options);
+            // 反地理编码  通过坐标查位置
+            searchWay(currentLocation);
+        }
     }
 }

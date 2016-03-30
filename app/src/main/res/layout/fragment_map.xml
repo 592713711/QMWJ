@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     tools:context="control.map.MapFragment">
 
-    <android.support.percent.PercentRelativeLayout
+    <com.zhy.android.percent.support.PercentRelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".MainActivity">
@@ -19,7 +19,7 @@
             app:layout_widthPercent="100%"></com.baidu.mapapi.map.MapView>
 
 
-        <android.support.percent.PercentRelativeLayout
+        <com.zhy.android.percent.support.PercentRelativeLayout
             android:id="@+id/head"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -28,10 +28,10 @@
             app:layout_widthPercent="100%">
 
             <ImageButton
+                android:id="@+id/back_btn"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:background="#00000000"
-                android:id="@+id/back_btn"
                 android:scaleType="fitXY"
                 android:src="@drawable/back_btn"
                 app:layout_heightPercent="100%"
@@ -76,10 +76,10 @@
             </RadioGroup>
 
             <ImageButton
+                android:id="@+id/search_btn"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:background="#00000000"
-                android:id="@+id/search_btn"
                 android:scaleType="fitXY"
                 android:src="@android:drawable/ic_menu_search"
                 app:layout_heightPercent="80%"
@@ -87,15 +87,15 @@
                 app:layout_marginTopPercent="10%"
                 app:layout_widthPercent="10%" />
 
-        </android.support.percent.PercentRelativeLayout>
+        </com.zhy.android.percent.support.PercentRelativeLayout>
 
-        <android.support.percent.PercentRelativeLayout
+        <com.zhy.android.percent.support.PercentRelativeLayout
             android:id="@+id/bottom"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            app:layout_marginTopPercent="89%"
             android:background="#ffffff"
             app:layout_heightPercent="7%"
+            android:layout_alignParentBottom="true"
             app:layout_widthPercent="100%">
 
             <TextView
@@ -106,14 +106,14 @@
                 android:layout_marginLeft="10dp"
                 android:text="在地图上点击要到达的位置" />
 
-        </android.support.percent.PercentRelativeLayout>
+        </com.zhy.android.percent.support.PercentRelativeLayout>
 
 
-        <android.support.percent.PercentRelativeLayout
+        <com.zhy.android.percent.support.PercentRelativeLayout
             android:id="@+id/bottom2"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            app:layout_marginTopPercent="85%"
+            android:layout_alignParentBottom="true"
             android:background="#ffffff"
             app:layout_heightPercent="11%"
             app:layout_widthPercent="100%">
@@ -122,21 +122,21 @@
                 android:id="@+id/location_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_marginTopPercent="10%"
+                android:text="刚刚宝贝在："
                 app:layout_marginLeftPercent="5%"
-                android:text="刚刚宝贝在：" />
+                app:layout_marginTopPercent="10%" />
 
             <TextView
                 android:id="@+id/location_text2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_marginTopPercent="50%"
-                app:layout_marginLeftPercent="5%"
                 android:text="暂无对方位置信息"
+                android:textColor="#333333"
                 android:textSize="16sp"
-                android:textColor="#333333"/>
+                app:layout_marginLeftPercent="5%"
+                app:layout_marginTopPercent="50%" />
 
-        </android.support.percent.PercentRelativeLayout>
+        </com.zhy.android.percent.support.PercentRelativeLayout>
 
         <CheckBox
             android:id="@+id/more_btn"
@@ -145,64 +145,138 @@
             android:background="@drawable/more_btn"
             android:button="@null"
             app:layout_heightPercent="7%"
-            app:layout_marginLeftPercent="86%"
+            app:layout_marginLeftPercent="88%"
             app:layout_marginTopPercent="15%"
-            app:layout_widthPercent="11%" />
+            app:layout_widthPercent="9%" />
 
-        <android.support.percent.PercentRelativeLayout
+        <com.zhy.android.percent.support.PercentRelativeLayout
             android:id="@+id/more_menu"
             android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:background="#ffffff"
-            app:layout_heightPercent="20%"
+            android:layout_height="wrap_content"
+            android:background="@drawable/menu_bg"
             android:visibility="gone"
+            android:paddingLeft="15dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:paddingRight="15dp"
             app:layout_marginLeftPercent="37%"
             app:layout_marginTopPercent="22%"
             app:layout_widthPercent="60%">
 
             <ImageButton
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:background="#00000000"
-                android:scaleType="fitXY"
                 android:id="@+id/mark_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#00000000"
+                android:onClick="doMark"
+                android:scaleType="fitXY"
                 android:src="@drawable/mark_btn"
-                app:layout_heightPercent="20%"
-                app:layout_marginLeftPercent="8%"
-                app:layout_marginTopPercent="10%"
-                app:layout_widthPercent="15%"
-                android:onClick="doMark"/>
+                android:layout_alignParentStart="true"
+               />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="标记"
-                app:layout_marginLeftPercent="10%"
-                app:layout_marginTopPercent="31%"
-                android:textSize="12sp"/>
+                android:id="@+id/text1"
+                android:textSize="12sp"
+                android:layout_below="@+id/mark_btn"
+                android:layout_alignStart="@+id/mark_btn"
+                android:layout_marginLeft="4dp"
+                />
 
             <ImageButton
-                android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:id="@+id/refresh_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:background="#00000000"
                 android:scaleType="fitXY"
-                android:id="@+id/refresh_btn"
                 android:src="@drawable/refresh_btn"
-                app:layout_heightPercent="20%"
-                app:layout_marginLeftPercent="45%"
-                app:layout_marginTopPercent="10%"
-                app:layout_widthPercent="15%" />
+                android:layout_centerHorizontal="true"
+                android:layout_alignBottom="@+id/mark_btn"
+
+                 />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="刷新"
-                app:layout_marginLeftPercent="47%"
-                app:layout_marginTopPercent="31%"
-                android:textSize="12sp"/>
-        </android.support.percent.PercentRelativeLayout>
+                android:textSize="12sp"
+                android:layout_alignStart="@+id/refresh_btn"
+                android:layout_below="@+id/refresh_btn"
+                android:layout_marginLeft="4dp"
+                />
 
-    </android.support.percent.PercentRelativeLayout>
+            <ImageButton
+                android:id="@+id/goto_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#00000000"
+                android:scaleType="fitXY"
+                android:src="@drawable/go_btn"
+                android:layout_alignParentEnd="true"
+                android:layout_centerHorizontal="true"
+                android:layout_alignBottom="@+id/refresh_btn"
+
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="到这里"
+                android:textSize="11sp"
+                android:layout_alignStart="@+id/goto_btn"
+                android:layout_below="@+id/goto_btn"
+                android:layout_marginLeft="0dp"
+                />
+
+            <ImageButton
+                android:id="@+id/way_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#00000000"
+                android:scaleType="fitXY"
+                android:src="@drawable/way_btn"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/mark_btn"
+                android:layout_marginTop="30dp"
+
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="路线图"
+                android:textSize="11sp"
+                android:layout_alignStart="@+id/way_btn"
+                android:layout_below="@+id/way_btn"
+                />
+
+            <ImageButton
+                android:id="@+id/protect_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#00000000"
+                android:scaleType="fitXY"
+                android:src="@drawable/protect_btn"
+                android:layout_centerHorizontal="true"
+                android:layout_alignBottom="@+id/way_btn"
+
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="防护区"
+                android:textSize="11sp"
+                android:layout_alignStart="@+id/protect_btn"
+                android:layout_below="@+id/protect_btn"
+
+                />
+
+        </com.zhy.android.percent.support.PercentRelativeLayout>
+
+    </com.zhy.android.percent.support.PercentRelativeLayout>
 
 
 </FrameLayout>

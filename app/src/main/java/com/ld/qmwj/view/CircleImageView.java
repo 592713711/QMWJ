@@ -20,6 +20,7 @@ import android.support.annotation.ColorRes;
 import android.support.annotation.DrawableRes;
 import android.util.AttributeSet;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 
 import com.ld.qmwj.R;
 
@@ -27,7 +28,7 @@ import com.ld.qmwj.R;
 /**
  * 圆形按钮
  */
-public class CircleImageView extends ImageButton {
+public class CircleImageView extends ImageView {
 
     private static final ScaleType SCALE_TYPE = ScaleType.CENTER_CROP;
 

@@ -100,8 +100,10 @@ public class LoginActivity extends AppCompatActivity {
             User user = MyApplication.getInstance().getSpUtil().getUser();
             Intent intent;
             if (user.status == Config.GUARDIAN_STATUS)
+                //监护方
                 intent = new Intent(LoginActivity.this, HomeActivity.class);
             else
+                //被监护方
                 intent = new Intent(LoginActivity.this, HomeActivity_under.class);
             startActivity(intent);
             finish();
