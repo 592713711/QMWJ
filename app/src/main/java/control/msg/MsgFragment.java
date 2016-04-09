@@ -2,6 +2,7 @@ package control.msg;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -18,6 +19,7 @@ import android.widget.Toast;
 import com.ld.qmwj.Config;
 import com.ld.qmwj.MyApplication;
 import com.ld.qmwj.R;
+import com.ld.qmwj.listener.MyRecycleViewItemListener;
 import com.ld.qmwj.message.Message;
 import com.ld.qmwj.message.request.ChatRequest;
 import com.ld.qmwj.message.request.Request;
@@ -25,6 +27,7 @@ import com.ld.qmwj.model.Monitor;
 import com.ld.qmwj.model.MyLocation;
 import com.ld.qmwj.model.chatmessage.ChatMessage;
 import com.ld.qmwj.model.chatmessage.SimpleMsg;
+import com.ld.qmwj.model.chatmessage.SmsMsg;
 import com.ld.qmwj.util.HandlerUtil;
 import com.ld.qmwj.view.MyEditText;
 
@@ -34,10 +37,13 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 
+import control.phone.linkman.LinkManActivity;
+import control.phone.sms.SmsContentActivity;
+
 /**
  * 消息显示相关的碎片
  */
-public class MsgFragment extends Fragment implements View.OnClickListener {
+public class MsgFragment extends Fragment implements View.OnClickListener, MyRecycleViewItemListener {
 
     private Monitor monitor;
     private ArrayList<ChatMessage> data;
@@ -75,24 +81,27 @@ public class MsgFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onResume() {
         super.onResume();
-        recycleViewMsg.scrollToPosition(data.size() - 1);
     }
 
     public void initData() {
         //开始初始化 1页 10条数据
-        data = MyApplication.getInstance().getMessageDao().getMsgById(monitor.id, currentPage, pageSize);
+        data = MyApplication.getInstance().getMessageDao().getMsgById(monitor.id, 1, pageSize);
         Log.d(Config.TAG, "数据：" + data.toString());
         rcAdapter.updateData(data);
-        recycleViewMsg.smoothScrollToPosition(data.size() - 1);
+
     }
 
     private void initView(View v) {
         recycleViewMsg = (RecyclerView) v.findViewById(R.id.recycleview_msg);
         rcAdapter = new MessageRcAdapter(context);
+        rcAdapter.setItemOnclickListener(this);
         recycleViewMsg.setAdapter(rcAdapter);
         initData();
 
         recycleViewMsg.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
+
+        //必须放在setLayoutManager后面
+        recycleViewMsg.scrollToPosition(data.size() - 1);
 
         input_edit = (MyEditText) v.findViewById(R.id.input_edit);
         sendBtn = (ImageButton) v.findViewById(R.id.doSend_btn);
@@ -121,7 +130,7 @@ public class MsgFragment extends Fragment implements View.OnClickListener {
         ImageButton addBtn = (ImageButton) v.findViewById(R.id.input_add_btn);
         sendBtn.setOnClickListener(this);
 
-
+       // recycleViewMsg.scrollToPosition(data.size() - 1);
     }
 
 
@@ -188,8 +197,8 @@ public class MsgFragment extends Fragment implements View.OnClickListener {
         if (currentCount != data.size()) {
             recycleViewMsg.scrollToPosition(data.size() - currentCount);
             recycleViewMsg.scrollBy(0, py - 50);
-        }else{
-            Toast.makeText(context,"暂无之前的记录",Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(context, "暂无之前的记录", Toast.LENGTH_SHORT).show();
         }
 
 
@@ -205,10 +214,42 @@ public class MsgFragment extends Fragment implements View.OnClickListener {
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void showInfo(Integer tag) {
-        if (tag == HandlerUtil.CAHT_UPDATE) {
+        if (tag == HandlerUtil.CAHT_UPDATE || tag == HandlerUtil.CALLPHONE_RESPONSE || tag == HandlerUtil.SMSSTATE_RESPONSE) {
             initData();
         }
     }
 
 
+    /**
+     * recycleview 视图项点击监听器
+     *
+     * @param v
+     * @param position
+     */
+    @Override
+    public void onItemClick(View v, int position) {
+        ChatMessage chatMessage = data.get(position);
+        // Log.d(Config.TAG,"点击了："+chatMessage);
+        if (chatMessage.msg_type == Config.CALL_MSG){
+            Intent intent=new Intent(context, LinkManActivity.class);
+            intent.putExtra("type",Config.CALL_MSG);
+            intent.putExtra("monitor",monitor);
+            startActivity(intent);
+        }else if (chatMessage.msg_type == Config.SMS_MSG) {
+            Intent intent=new Intent(context, SmsContentActivity.class);
+            SmsMsg smsMsg=(SmsMsg)chatMessage;
+            String name=smsMsg.smsName;
+            if(name == null)
+                name=smsMsg.smsNum;
+            Bundle bundle = new Bundle();
+            //存入姓名
+            bundle.putString("name", name);
+            //存入电话号码
+            bundle.putString("phonenum", smsMsg.smsNum);
+            bundle.putSerializable("monitor", monitor);
+            //传递Bundle
+            intent.putExtra("SMS", bundle);
+            startActivity(intent);
+        }
+    }
 }

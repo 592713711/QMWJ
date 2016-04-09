@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.TextView;
 
 import com.ashokvarma.bottomnavigation.BottomNavigationBar;
 import com.ashokvarma.bottomnavigation.BottomNavigationItem;
@@ -48,21 +49,27 @@ public class HomeActivity_under extends AppCompatActivity {
     User user;
     private BottomNavigationBar bottomNavigationBar;        //底部导航
     private MsgFragment msgFragment;
+    private PhoneFragment phoneFragment;
     private FragmentManager fm;
     private FragmentTransaction transaction;
+    private TextView title_text;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home2);
         initWindow();
         myApplication=MyApplication.getInstance();
-
+        initView();
         initData();
         //开启服务和广播
         openService();
         initBottom();
 
 
+    }
+
+    private void initView() {
+        title_text= (TextView) findViewById(R.id.title);
     }
 
     /**
@@ -94,7 +101,7 @@ public class HomeActivity_under extends AppCompatActivity {
         bottomNavigationBar.setTabSelectedListener(new BottomNavigationBar.OnTabSelectedListener() {
             @Override
             public void onTabSelected(int position) {
-
+                changeFragment(position);
 
             }
 
@@ -115,12 +122,13 @@ public class HomeActivity_under extends AppCompatActivity {
        // mapFragment = new MapFragment(monitor, this);
         ArrayList<Monitor> monitors=MyApplication.getInstance().getRelateDao().getList();
         msgFragment = new MsgFragment(monitors.get(0),this);
+        phoneFragment=new PhoneFragment(this);
        // phoneFragment = new PhoneFragment(monitor, this);
         fm = getFragmentManager();
         transaction = fm.beginTransaction();
       //  transaction.add(R.id.content, mapFragment);
         transaction.add(R.id.content, msgFragment);
-      //  transaction.add(R.id.content, phoneFragment);
+        transaction.add(R.id.content, phoneFragment);
         transaction.commit();
 
         changeFragment(0);
@@ -135,11 +143,16 @@ public class HomeActivity_under extends AppCompatActivity {
         transaction = fm.beginTransaction();
         transaction.hide(msgFragment);
        // transaction.hide(mapFragment);
-       // transaction.hide(phoneFragment);
+        transaction.hide(phoneFragment);
         switch (position) {
             case 0:
-           //     title_text.setText(monitor.remark_name);
+                title_text.setText("消息");
                 transaction.show(msgFragment);
+                transaction.commit();
+                break;
+            case 2:
+                title_text.setText("功能");
+                transaction.show(phoneFragment);
                 transaction.commit();
                 break;
         }

@@ -488,7 +488,6 @@ public class MapFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.d(Config.TAG, "onDestroy");
         //在activity执行onDestroy时执行mMapView.onDestroy()，实现地图生命周期管理
         mMapView.onDestroy();
     }
@@ -497,7 +496,6 @@ public class MapFragment extends Fragment implements View.OnClickListener {
     public void onResume() {
         super.onResume();
         //在activity执行onResume时执行mMapView. onResume ()，实现地图生命周期管理
-        Log.d(Config.TAG, "onResume");
         mMapView.onResume();
 
     }
@@ -524,7 +522,6 @@ public class MapFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onPause() {
         super.onPause();
-        Log.d(Config.TAG, "onPause");
         //在activity执行onPause时执行mMapView. onPause ()，实现地图生命周期管理
         mMapView.onPause();
 

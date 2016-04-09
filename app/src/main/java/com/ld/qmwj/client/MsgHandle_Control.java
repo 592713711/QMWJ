@@ -80,6 +80,12 @@ public class MsgHandle_Control {
     public void handleCallPhone(String msgJson) {
         CallPhoneRes callPhoneRes = gson.fromJson(msgJson, CallPhoneRes.class);
         PhoneState phoneState=callPhoneRes.phoneState;
+
+        //短信时间和现在时间对比，若比现在时间还大，则变为现在时间
+        if(phoneState.getEndTime()>System.currentTimeMillis()){
+            phoneState.setEndTime(System.currentTimeMillis());
+        }
+
         //将通话记录放入通话表中
         MyApplication.getInstance().getCallPhoneDao().insertCallPhone(callPhoneRes.from_id, phoneState);
         //放入信息表中
@@ -111,9 +117,15 @@ public class MsgHandle_Control {
     public void handleSms(String msgJson) {
         SmsResponse smsResponse=gson.fromJson(msgJson,SmsResponse.class);
         Sms sms=smsResponse.sms;
-        //放入信息表中
-        MyApplication.getInstance().getSmsDao().insertSms(smsResponse.from_id,sms);
 
+
+        //短信时间和现在时间对比，若比现在时间还大，则变为现在时间
+        if(sms.getDate()>System.currentTimeMillis()){
+            sms.setDate(System.currentTimeMillis());
+        }
+
+        //放入信息表中
+        MyApplication.getInstance().getSmsDao().insertSms(smsResponse.from_id, sms);
         //放入信息表
         SmsMsg smsMsg=new SmsMsg();
         smsMsg.smsNum=sms.getPhoneNumber();
@@ -122,9 +134,11 @@ public class MsgHandle_Control {
         String msg=gson.toJson(smsMsg);
         smsMsg.is_coming=Config.FROM_MSG;
         smsMsg.time=sms.getDate();
+
+
         MyApplication.getInstance().getMessageDao().addMessage(
-                smsResponse.from_id,smsMsg,msg);
+                smsResponse.from_id, smsMsg, msg);
         //发送收到通话记录事件
-        EventBus.getDefault().post(HandlerUtil.CALLPHONE_RESPONSE);
+        EventBus.getDefault().post(HandlerUtil.SMSSTATE_RESPONSE);
     }
 }

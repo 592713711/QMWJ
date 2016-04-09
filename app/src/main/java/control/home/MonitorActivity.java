@@ -75,6 +75,7 @@ public class MonitorActivity extends AppCompatActivity {
     }
 
 
+
     /**
      * 初始化底部导航栏
      */
@@ -126,7 +127,7 @@ public class MonitorActivity extends AppCompatActivity {
 
 
         mapFragment = new MapFragment(monitor, this);
-        msgFragment = new MsgFragment(monitor,this);
+        msgFragment = new MsgFragment(monitor, this);
         phoneFragment = new PhoneFragment(monitor, this);
         fm = getFragmentManager();
         transaction = fm.beginTransaction();
@@ -136,8 +137,6 @@ public class MonitorActivity extends AppCompatActivity {
         transaction.commit();
 
         changeFragment(0);
-
-
 
 
     }
@@ -255,6 +254,7 @@ public class MonitorActivity extends AppCompatActivity {
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void showInfo(Integer tag) {
+        Log.d(Config.TAG, "收到响应" + tag);
         if (tag == HandlerUtil.LOCATION_RESPONSE) {
             //收到位置响应
             MyLocation location = MyApplication.getInstance().getRelateDao().getLocation(monitor.id);
@@ -269,8 +269,6 @@ public class MonitorActivity extends AppCompatActivity {
             updateHint();
         } else if (tag == HandlerUtil.CONNECT_SUC || tag == HandlerUtil.CONNECT_FAIL) {
             updateHint();
-        }else if (tag == HandlerUtil.CAHT_UPDATE) {
-            msgFragment.initData();
         }
     }
 

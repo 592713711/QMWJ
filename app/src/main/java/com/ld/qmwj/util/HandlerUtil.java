@@ -21,5 +21,9 @@ public class HandlerUtil {
     public static final int SMSSTATE = 15;      //短信状态改变
     public static final int SENDSMSSTATE = 16;      //发送短信监控到服务器
     public static final int SMSSTATE_RESPONSE = 17;      //收到短信监控响应
+    public static final int STOP_SCAN = 18;      //停止扫描蓝牙设备
+    public static final int CONNECTBAND = 19;      //连接手环
+    public static final int DISCONNECTBAND = 20;      //断开连接手环
+
 
 }

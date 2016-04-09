@@ -9,11 +9,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.ld.qmwj.Config;
 import com.ld.qmwj.R;
+import com.ld.qmwj.listener.MyRecycleViewItemListener;
 import com.ld.qmwj.model.chatmessage.ChatMessage;
 import com.ld.qmwj.model.chatmessage.PhoneStateMsg;
 import com.ld.qmwj.model.chatmessage.SimpleMsg;
@@ -29,6 +31,7 @@ public class MessageRcAdapter extends RecyclerView.Adapter {
     private ArrayList<ChatMessage> data;
     private Context context;
     private LayoutInflater inflater;
+    private MyRecycleViewItemListener myRcClickListener;
 
     public static final int CHAT_FROM_TYPE = 0;
     public static final int CHAT_SEND_TYPE = 1;
@@ -46,6 +49,11 @@ public class MessageRcAdapter extends RecyclerView.Adapter {
         notifyDataSetChanged();
     }
 
+    public void setItemOnclickListener(MyRecycleViewItemListener listener) {
+        this.myRcClickListener = listener;
+
+    }
+
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         MyViewHolder holder = null;
@@ -61,7 +69,7 @@ public class MessageRcAdapter extends RecyclerView.Adapter {
                 break;
             case HINT_FROM_TYPE:
                 v = inflater.inflate(R.layout.hint_from_item, null);
-                holder = new HintFromHolder(v);
+                holder = new HintFromHolder(v,myRcClickListener);
                 break;
 
         }
@@ -98,28 +106,29 @@ public class MessageRcAdapter extends RecyclerView.Adapter {
             if (cm.msg_type == Config.CALL_MSG) {   //通话记录
                 PhoneStateMsg phoneStateMsg = (PhoneStateMsg) cm;
                 Bitmap icon = null;
-                StringBuffer hint = new StringBuffer();
+                StringBuffer hint1 = new StringBuffer();
                 String name;
                 if (phoneStateMsg.phonename == null)
-                    name=(phoneStateMsg.phoneNum);
+                    name = (phoneStateMsg.phoneNum);
                 else
-                    name=(phoneStateMsg.phonename);
-                switch (phoneStateMsg.call_Type){
+                    name = (phoneStateMsg.phonename);
+                switch (phoneStateMsg.call_Type) {
                     case Config.CALL_INTO:
-                        icon=BitmapFactory.decodeResource(context.getResources(),R.drawable.call_into);
-                        hint.append("接听来自 "+name+" 的电话");
+                        icon = BitmapFactory.decodeResource(context.getResources(), R.drawable.call_into);
+                        hint1.append("接听电话");
                         break;
                     case Config.CALL_GOTO:
-                        icon=BitmapFactory.decodeResource(context.getResources(),R.drawable.call_goto);
-                        hint.append("拨打电话给 "+name);
+                        icon = BitmapFactory.decodeResource(context.getResources(), R.drawable.call_goto);
+                        hint1.append("拨打电话给");
                         break;
                     case Config.CALL_MISS:
-                        icon=BitmapFactory.decodeResource(context.getResources(),R.drawable.call_miss);
-                        hint.append("未接到 "+name+" 的电话");
+                        icon = BitmapFactory.decodeResource(context.getResources(), R.drawable.call_miss);
+                        hint1.append("未接电话");
                         break;
                 }
 
-                hintFromHolder.hintText.setText(hint);
+                hintFromHolder.hintText1.setText(hint1);
+                hintFromHolder.hintText2.setText(name);
                 hintFromHolder.iconImage.setImageBitmap(icon);
             } else if (cm.msg_type == Config.SMS_MSG) {
                 //短信监听记录
@@ -138,10 +147,10 @@ public class MessageRcAdapter extends RecyclerView.Adapter {
                 }
 
                 if (smsMsg.smsName == null)
-                    hint.append(smsMsg.smsNum);
+                    hintFromHolder.hintText2.setText(smsMsg.smsNum);
                 else
-                    hint.append(smsMsg.smsName);
-                hintFromHolder.hintText.setText(hint);
+                    hintFromHolder.hintText2.setText(smsMsg.smsName);
+                hintFromHolder.hintText1.setText(hint);
                 hintFromHolder.iconImage.setImageBitmap(icon);
 
             }
@@ -204,14 +213,27 @@ public class MessageRcAdapter extends RecyclerView.Adapter {
         }
     }
 
-    class HintFromHolder extends MyViewHolder {
+    class HintFromHolder extends MyViewHolder implements View.OnClickListener{
         ImageView iconImage;
-        TextView hintText;
-
-        public HintFromHolder(View itemView) {
+        TextView hintText1;
+        TextView hintText2;
+        RelativeLayout layout;
+        MyRecycleViewItemListener onClickListener;
+        public HintFromHolder(View itemView,MyRecycleViewItemListener onClickListener) {
             super(itemView);
+            this.onClickListener=onClickListener;
+
             iconImage = (ImageView) itemView.findViewById(R.id.hint_icon);
-            hintText = (TextView) itemView.findViewById(R.id.hintmsg);
+            hintText1 = (TextView) itemView.findViewById(R.id.hintmsg1);
+            hintText2 = (TextView) itemView.findViewById(R.id.hintmsg2);
+            layout= (RelativeLayout) itemView.findViewById(R.id.chat_content);
+            layout.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            if(onClickListener!=null)
+                onClickListener.onItemClick(v,getAdapterPosition());
         }
     }
 

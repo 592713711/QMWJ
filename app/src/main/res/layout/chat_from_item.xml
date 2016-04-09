@@ -1,8 +1,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#00000000"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:background="#00000000">
 
     <com.zhy.android.percent.support.PercentRelativeLayout
         android:layout_width="match_parent"
@@ -14,36 +14,35 @@
             style="@style/chat_date_style"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
             android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp"
             android:background="@drawable/roundshape"
-            android:text="03-25 23:02"
-           />
+            android:text="03-25 23:02" />
 
         <com.ld.qmwj.view.CircleImageView
+            android:id="@+id/chat_icon"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:layout_below="@+id/chat_createDate"
-            android:id="@+id/chat_icon"
             android:layout_alignParentStart="true"
+            android:layout_below="@+id/chat_createDate"
             android:layout_marginTop="10dp"
             android:src="@drawable/h1"
-            app:layout_marginLeftPercent="2%w"/>
+            app:layout_marginLeftPercent="2%w" />
 
         <TextView
             android:id="@+id/chat_content"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/chat_icon"
+            android:layout_marginBottom="10dp"
+            android:layout_toEndOf="@+id/chat_icon"
             android:background="@drawable/chat_from_bg"
             android:clickable="true"
+            android:gravity="center_vertical"
             android:text="Android 线程、组件之间通信可以通过Handler消息处理器，BroadCast广播，Service服务等。   这儿介绍的EventBus是一款针对Android优化的发布/订阅的事件总线"
             android:textColor="#000"
-            android:gravity="center_vertical"
             android:textSize="16sp"
-            android:layout_alignTop="@+id/chat_icon"
-            android:layout_toEndOf="@+id/chat_icon"
-            app:layout_marginRightPercent="10%w"
-            />
+            app:layout_marginRightPercent="10%w" />
 
     </com.zhy.android.percent.support.PercentRelativeLayout>
 
