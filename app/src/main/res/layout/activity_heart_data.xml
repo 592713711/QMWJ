@@ -1,0 +1,100 @@
+<com.zhy.android.percent.support.PercentRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipToPadding="true"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical">
+
+
+    <com.zhy.android.percent.support.PercentRelativeLayout
+        android:id="@+id/head"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@color/red"
+        app:layout_heightPercent="7%"
+        app:layout_widthPercent="100%">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:text="心率数据"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            app:layout_marginTopPercent="20%" />
+
+        <ImageButton
+            android:id="@+id/quit_btn"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_centerVertical="true"
+            android:background="#00000000"
+            android:onClick="doQuit"
+            android:scaleType="fitXY"
+            android:src="@drawable/quit_btn"
+            app:layout_heightPercent="60%h"
+            app:layout_marginLeftPercent="3%"
+            app:layout_widthPercent="60%h" />
+
+        <ImageButton
+            android:id="@+id/refresh_btn"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:background="#00000000"
+            android:scaleType="fitXY"
+            android:src="@drawable/heart_refresh"
+            android:visibility="gone"
+            app:layout_heightPercent="60%h"
+            app:layout_marginRightPercent="4%"
+            app:layout_widthPercent="60%h" />
+    </com.zhy.android.percent.support.PercentRelativeLayout>
+
+    <com.zhy.android.percent.support.PercentRelativeLayout
+        android:id="@+id/select"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_below="@+id/head"
+        android:background="@color/red"
+        app:layout_heightPercent="5%"
+        app:layout_widthPercent="100%">
+
+        <TextView
+            android:id="@+id/date_text"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:gravity="center"
+            android:text="2016-1-20"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            app:layout_heightPercent="90%" />
+
+
+    </com.zhy.android.percent.support.PercentRelativeLayout>
+
+
+    <android.support.design.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/coordinatorLayout"
+        android:layout_below="@+id/select">
+
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/heart_chart"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
+
+
+    </android.support.design.widget.CoordinatorLayout>
+
+
+</com.zhy.android.percent.support.PercentRelativeLayout>

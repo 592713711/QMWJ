@@ -9,6 +9,7 @@ import com.ld.qmwj.client.ClientService;
 import com.ld.qmwj.dao.AuthDao;
 import com.ld.qmwj.dao.CacheDao;
 import com.ld.qmwj.dao.CallPhoneDao;
+import com.ld.qmwj.dao.HeartDao;
 import com.ld.qmwj.dao.LinkManDao;
 import com.ld.qmwj.dao.MessageDao;
 import com.ld.qmwj.dao.RelateDao;
@@ -37,6 +38,7 @@ public class MyApplication extends Application {
     private LinkManDao linkManDao;
     private MessageDao messageDao;
     private SmsDao smsDao;
+    private HeartDao heartDao;
 
     public static final String SP_FILE_NAME = "user_sp";
 
@@ -132,6 +134,12 @@ public class MyApplication extends Application {
         if (smsDao == null)
             smsDao = new SmsDao(this);
         return smsDao;
+    }
+
+    public synchronized HeartDao getHeartDao() {
+        if (heartDao == null)
+            heartDao = new HeartDao(this);
+        return heartDao;
     }
 
 

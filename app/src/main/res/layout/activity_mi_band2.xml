@@ -1,0 +1,210 @@
+<com.zhy.android.percent.support.PercentRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipToPadding="true"
+    android:fitsSystemWindows="true"
+    tools:context="control.home.MonitorActivity">
+
+    <com.zhy.android.percent.support.PercentRelativeLayout
+        android:id="@+id/head"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="#29b6f6"
+        app:layout_heightPercent="7%"
+        app:layout_widthPercent="100%">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:text="他的手环"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            app:layout_marginTopPercent="20%" />
+
+        <ImageButton
+            android:id="@+id/quit_btn"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_centerVertical="true"
+            android:background="#00000000"
+            android:onClick="doQuit"
+            android:scaleType="fitXY"
+            android:src="@drawable/quit_btn"
+            app:layout_heightPercent="60%h"
+            app:layout_marginLeftPercent="3%"
+            app:layout_widthPercent="60%h" />
+
+    </com.zhy.android.percent.support.PercentRelativeLayout>
+
+
+    <com.zhy.android.percent.support.PercentRelativeLayout
+        android:id="@+id/mi_content"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_below="@+id/head"
+        android:background="@color/unbindbg"
+        app:layout_heightPercent="70%h">
+
+
+        <com.zhy.android.percent.support.PercentRelativeLayout
+            android:id="@+id/circle_layout"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_heightPercent="60%h"
+            app:layout_marginTopPercent="10%">
+
+            <com.ld.qmwj.view.CircleHintView
+                android:id="@+id/circlehintview"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                app:layout_heightPercent="100%h"
+                app:layout_widthPercent="100%h" />
+
+            <com.ld.qmwj.view.NumberView
+                android:id="@+id/hintText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:text=""
+                android:textColor="#e0e0e0"
+                android:textSize="19sp" />
+
+            <ImageView
+                android:id="@+id/battery_icon"
+                android:layout_width="40dp"
+                android:layout_height="20dp"
+                android:layout_below="@+id/hintText"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="40dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/battery_frame" />
+
+            <ProgressBar
+                android:id="@+id/progress_bar"
+                android:layout_width="55dp"
+                android:layout_height="55dp"
+                android:layout_below="@+id/hintText"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="20dp"
+                android:scaleType="fitXY"
+                android:clickable="false"
+                 />
+
+            <com.ld.qmwj.view.BandConnectView
+                android:id="@+id/connecting_icon"
+                android:layout_width="80dp"
+                android:layout_height="65dp"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:layout_marginTop="5dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/ic_mili" />
+        </com.zhy.android.percent.support.PercentRelativeLayout>
+
+
+        <Button
+            android:id="@+id/band_btn"
+            android:layout_width="180dp"
+            android:layout_height="50dp"
+            android:layout_below="@+id/circle_layout"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="40dp"
+            android:background="@drawable/selector_btn_bg2"
+            android:onClick="doBand"
+            android:text="更新状态"
+            android:textColor="@android:color/white"
+            android:textSize="16sp" />
+
+    </com.zhy.android.percent.support.PercentRelativeLayout>
+
+
+    <com.zhy.android.percent.support.PercentRelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/mi_content">
+
+
+        <com.zhy.android.percent.support.PercentRelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true">
+
+            <ImageButton
+                android:id="@+id/walk_btn"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_alignParentStart="true"
+                android:background="#00000000"
+                android:scaleType="fitXY"
+                android:src="@drawable/miband_walk_btn"
+                app:layout_marginLeftPercent="10%"
+                 />
+
+            <TextView
+                android:id="@+id/text1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignStart="@+id/walk_btn"
+                android:layout_below="@+id/walk_btn"
+                android:layout_marginTop="3dp"
+                android:text="当日步数"
+                android:textSize="12sp" />
+
+
+            <ImageButton
+                android:id="@+id/heart_btn"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignTop="@+id/walk_btn"
+                android:background="#00000000"
+                android:scaleType="fitXY"
+                android:src="@drawable/miband_heart_btn"
+                app:layout_marginRightPercent="10%" />
+
+            <TextView
+                android:id="@+id/text2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignStart="@+id/heart_btn"
+                android:layout_below="@+id/heart_btn"
+                android:layout_marginTop="3dp"
+                android:text="心率检测"
+                android:textSize="12sp" />
+
+            <ImageButton
+                android:id="@+id/sleep_btn"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_alignTop="@+id/walk_btn"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:background="#00000000"
+                android:scaleType="fitXY"
+                android:src="@drawable/miband_sleep_btn" />
+
+            <TextView
+                android:id="@+id/text3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignStart="@+id/sleep_btn"
+                android:layout_below="@+id/sleep_btn"
+                android:layout_marginTop="3dp"
+                android:text="睡眠情况"
+                android:textSize="12sp" />
+
+        </com.zhy.android.percent.support.PercentRelativeLayout>
+
+    </com.zhy.android.percent.support.PercentRelativeLayout>
+
+
+</com.zhy.android.percent.support.PercentRelativeLayout>

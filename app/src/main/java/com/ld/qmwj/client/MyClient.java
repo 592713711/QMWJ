@@ -25,6 +25,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
+import io.netty.handler.timeout.IdleStateHandler;
 
 /**
  * Created by zsg on 2015/11/21.
@@ -54,6 +55,8 @@ public class MyClient implements Config {
         bootstrap.handler(new ChannelInitializer<SocketChannel>() {
             @Override
             protected void initChannel(SocketChannel ch) throws Exception {
+                ///读操作空闲时间   写操作空闲时间   读写全部空闲时间  20s 发送一次心跳包
+                ch.pipeline().addLast("ping", new IdleStateHandler(90, 25, 20,TimeUnit.SECONDS));
                 // 创建分隔符缓冲对象
                 ByteBuf delimiter = Unpooled.copiedBuffer("#"
                         .getBytes());

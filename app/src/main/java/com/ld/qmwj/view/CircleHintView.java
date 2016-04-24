@@ -46,6 +46,7 @@ public class CircleHintView extends View {
 
     private int level = 0;          //电池电量
     private int duration = 1500;      //电量外圈动画时间
+    public boolean isAnim=false;        //控制动画的开关
 
     public CircleHintView(Context context) {
         this(context, null);
@@ -92,7 +93,7 @@ public class CircleHintView extends View {
         canvas.drawBitmap(bitmap_icon, mTotalWidth / 2 - bitmap_icon.getWidth() / 2, 0, null);
         canvas.drawArc(mRectf, start_angle, all_angle, false, paint_out_cir);
 
-        if (level > 0) {
+        if (level > 0&&isAnim) {
             int level_angle = (int) ((float) level / 100 * all_angle);
             canvas.drawArc(mRectf, start_angle, level_angle, false, level_paint);
         }

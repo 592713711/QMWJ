@@ -21,5 +21,8 @@
     <string name="title_activity_health">HealthActivity</string>
     <string name="title_activity_sms_list">SmsListActivity</string>
     <string name="title_activity_sms_content">SmsContentActivity</string>
+    <string name="title_activity_mi_band">MiBandActivity</string>
+    <string name="title_activity_bind_band">BindBandActivity</string>
+    <string name="title_activity_heart_data">HeartDataActivity</string>
 
 </resources>

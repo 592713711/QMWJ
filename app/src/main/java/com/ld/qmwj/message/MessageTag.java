@@ -46,5 +46,23 @@ public class MessageTag {
     //短信响应
     public static final int SMS_RES=17;
 
+    //请求手环状态
+    public static final int BANDSTATE_REQ=18;
+    //手环状态响应
+    public static final int BANDSTATE_RES=19;
+    //测试心跳请求
+    public static final int DOHEART_REQ=20;
+    //测试心跳响应
+    public static final int DOHEART_RES=21;
+    //心跳数据请求
+    public static final int HEARTDATA_REQ=22;
+    //心跳数据响应
+    public static final int HEARTDATA_RES=23;
+
+    //权限
+    public static final int AUTH_MSG=24;
+    public static final int AUTH_CHANGE=25;
+
+
 }
 

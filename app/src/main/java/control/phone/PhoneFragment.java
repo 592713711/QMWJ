@@ -1,21 +1,19 @@
 package control.phone;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 
 import com.ld.qmwj.R;
 import com.ld.qmwj.model.Monitor;
 
-import control.phone.health.HealthActivity;
+import control.phone.health.MiBandActivity;
+import under_control.home.miband.HeartActivity;
 import control.phone.linkman.LinkManActivity;
 import control.phone.sms.SmsListActivity;
 
@@ -69,7 +67,7 @@ public class PhoneFragment extends Fragment implements View.OnClickListener{
                 break;
             case R.id.health_btn:
                 //打开联系人活动
-                intent=new Intent(context, HealthActivity.class);
+                intent=new Intent(context, MiBandActivity.class);
                 intent.putExtra("monitor",monitor);
                 startActivity(intent);
                 break;

@@ -24,6 +24,10 @@ public class HandlerUtil {
     public static final int STOP_SCAN = 18;      //停止扫描蓝牙设备
     public static final int CONNECTBAND = 19;      //连接手环
     public static final int DISCONNECTBAND = 20;      //断开连接手环
+    public static final int BANDSTATE_RESPONSE=21;
+    public static final int UPDATEHEARTDATA=22;     //更新心跳数据
+    public static final int DOHEART=23;     //测量心跳数据
+    public static final int AUTH_MSG=24;     //测量心跳数据
 
 
 }

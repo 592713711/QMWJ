@@ -41,6 +41,7 @@ import java.util.Date;
 
 
 import control.msg.MsgFragment;
+import under_control.home.map.UnderMapFragment;
 import under_control.home.service.FuctionService;
 import under_control.home.service.LocationService;
 
@@ -50,6 +51,7 @@ public class HomeActivity_under extends AppCompatActivity {
     private BottomNavigationBar bottomNavigationBar;        //底部导航
     private MsgFragment msgFragment;
     private PhoneFragment phoneFragment;
+    private UnderMapFragment mapFragment;
     private FragmentManager fm;
     private FragmentTransaction transaction;
     private TextView title_text;
@@ -123,11 +125,11 @@ public class HomeActivity_under extends AppCompatActivity {
         ArrayList<Monitor> monitors=MyApplication.getInstance().getRelateDao().getList();
         msgFragment = new MsgFragment(monitors.get(0),this);
         phoneFragment=new PhoneFragment(this);
-       // phoneFragment = new PhoneFragment(monitor, this);
+        mapFragment = new UnderMapFragment(this);
         fm = getFragmentManager();
         transaction = fm.beginTransaction();
-      //  transaction.add(R.id.content, mapFragment);
         transaction.add(R.id.content, msgFragment);
+        transaction.add(R.id.content, mapFragment);
         transaction.add(R.id.content, phoneFragment);
         transaction.commit();
 
@@ -142,12 +144,17 @@ public class HomeActivity_under extends AppCompatActivity {
     private void changeFragment(int position) {
         transaction = fm.beginTransaction();
         transaction.hide(msgFragment);
-       // transaction.hide(mapFragment);
+        transaction.hide(mapFragment);
         transaction.hide(phoneFragment);
         switch (position) {
             case 0:
                 title_text.setText("消息");
                 transaction.show(msgFragment);
+                transaction.commit();
+                break;
+            case 1:
+                title_text.setText("地图");
+                transaction.show(mapFragment);
                 transaction.commit();
                 break;
             case 2:

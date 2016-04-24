@@ -12,13 +12,19 @@
     <color name="color_666666">#666666</color>
     <color name="color_999999">#999999</color>
 
-    <color name="heart_default">#E48674</color>
+    <color name="heart_default">#eb9281</color>
+
     <color name="heart_select">#E48674</color>
 
-    <color name="translucent">#10000000</color>
+
+    <color name="translucent">#20000000</color>
+    <color name="translucent2">#df624a</color>
 
     <color name="rippelColor">#FFFFFF</color>
     <color name="heartbeat">#EAAD7E</color>
+
+    <color name="unbindbg">#3b444d</color>
+    <color name="bindbg">#4ac947</color>
 
     <color name="r">#66ff0000</color>
     <color name="g">#6600ff00</color>

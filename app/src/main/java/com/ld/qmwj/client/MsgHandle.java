@@ -7,6 +7,7 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.ld.qmwj.Config;
 import com.ld.qmwj.MyApplication;
+import com.ld.qmwj.message.AuthMessage;
 import com.ld.qmwj.message.MessageTag;
 import com.ld.qmwj.message.request.ChatRequest;
 import com.ld.qmwj.message.response.LoginResponse;
@@ -97,11 +98,45 @@ public class MsgHandle {
                 break;
             case MessageTag.CHAT_REQ:
                 handleChat(msgJson);
+                break;
             case MessageTag.SMS_RES:
                 msgHandle_control.handleSms(msgJson);
-
+                break;
+            case MessageTag.BANDSTATE_REQ:      //手环状态请求
+                msgHandle_under.handleBandState(msgJson);
+                break;
+            case MessageTag.BANDSTATE_RES:      //手环状态响应
+                msgHandle_control.handleBandState(msgJson);
+                break;
+            case MessageTag.DOHEART_REQ:    //测量心率请求
+                msgHandle_under.handleDoHeart(msgJson);
+                break;
+            case MessageTag.DOHEART_RES:    //测量心率响应
+                msgHandle_control.handleDoHeart(msgJson);
+                break;
+            case MessageTag.HEARTDATA_REQ:  //心跳数据请求
+                msgHandle_under.handleHeartData(msgJson);
+                break;
+            case MessageTag.HEARTDATA_RES:  //心跳数据响应
+                msgHandle_control.handleHeartData(msgJson);
+                break;
+            case MessageTag.AUTH_MSG:       //权限消息
+                handleAuth(msgJson);
+                break;
 
         }
+    }
+
+
+    /**
+     * 处理权限消息
+     * @param msgJson
+     */
+    private void handleAuth(String msgJson) {
+        AuthMessage authMessage=gson.fromJson(msgJson,AuthMessage.class);
+        //将权限写入权限表
+        MyApplication.getInstance().getAuthDao().initAuth(authMessage.from_id,authMessage.authority);
+        EventBus.getDefault().post(HandlerUtil.AUTH_MSG);
     }
 
     /**
@@ -150,25 +185,27 @@ public class MsgHandle {
                     MyApplication.getInstance().getRelateDao().addList(refreshListRes.monitorList);
                     if(spUtil.getUser().status==Config.GUARDIAN_STATUS){
                         //当前用户时监护方
-                        MyApplication.getInstance().getAuthDao().initAuth(refreshListRes.monitorList);
+                        //MyApplication.getInstance().getAuthDao().initAuth(refreshListRes.monitorList);
                     }else{
                         //当前用户为被监护方 将自己的权限写入
                         MyApplication.getInstance().getAuthDao().initAuth(spUtil.getUser().id);
                     }
                 }
-                else
+                else {
                     //自动登录
+                   // MyApplication.getInstance().getRelateDao().addList(refreshListRes.monitorList);
                     MyApplication.getInstance().getRelateDao().updateState(refreshListRes.monitorList);
+                }
             }
             tag = HandlerUtil.LOGIN_SUCCESS;
 
-
+            //发送缓存表消息
+            MyApplication.getInstance().getSendMsgUtil().sendCache();
         } else {
             tag = HandlerUtil.LOGIN_FAIL;
         }
 
         EventBus.getDefault().post(tag);
-        //发送缓存消息
 
     }
 

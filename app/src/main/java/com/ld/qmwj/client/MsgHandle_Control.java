@@ -8,7 +8,10 @@ import com.baidu.mapapi.model.LatLng;
 import com.google.gson.Gson;
 import com.ld.qmwj.Config;
 import com.ld.qmwj.MyApplication;
+import com.ld.qmwj.message.response.BandStateRes;
 import com.ld.qmwj.message.response.CallPhoneRes;
+import com.ld.qmwj.message.response.DoHeartRes;
+import com.ld.qmwj.message.response.HeartDataResponse;
 import com.ld.qmwj.message.response.LinkManResponse;
 import com.ld.qmwj.message.response.LocationRes;
 import com.ld.qmwj.message.response.OldWayResponse;
@@ -140,5 +143,37 @@ public class MsgHandle_Control {
                 smsResponse.from_id, smsMsg, msg);
         //发送收到通话记录事件
         EventBus.getDefault().post(HandlerUtil.SMSSTATE_RESPONSE);
+    }
+
+    /**
+     * 处理手环状态响应
+     * @param msgJson
+     */
+    public void handleBandState(String msgJson) {
+        BandStateRes bandStateRes=gson.fromJson(msgJson,BandStateRes.class);
+        EventBus.getDefault().post(bandStateRes.bandState);
+    }
+
+    /**
+     * 处理心跳请求响应
+     * @param msgJson
+     */
+    public void handleDoHeart(String msgJson) {
+        DoHeartRes doHeartRes=gson.fromJson(msgJson,DoHeartRes.class);
+        //保存心跳数据
+        MyApplication.getInstance().getHeartDao().insertHeartData(
+                doHeartRes.from_id,
+                doHeartRes.heartData
+        );
+        EventBus.getDefault().post(doHeartRes.heartData);
+    }
+
+    public void handleHeartData(String msgJson) {
+        HeartDataResponse response=gson.fromJson(msgJson,HeartDataResponse.class);
+        MyApplication.getInstance().getHeartDao().updateHeartData(
+                response.from_id,response.datas,response.from_time,response.to_timie
+        );
+
+        EventBus.getDefault().post(HandlerUtil.UPDATEHEARTDATA);
     }
 }

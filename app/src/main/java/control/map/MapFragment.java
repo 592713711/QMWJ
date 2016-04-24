@@ -3,19 +3,16 @@ package control.map;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Point;
-import android.media.Image;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -67,7 +64,6 @@ import com.baidu.mapapi.search.route.TransitRoutePlanOption;
 import com.baidu.mapapi.search.route.TransitRouteResult;
 import com.baidu.mapapi.search.route.WalkingRoutePlanOption;
 import com.baidu.mapapi.search.route.WalkingRouteResult;
-import com.ld.qmwj.Config;
 import com.ld.qmwj.MyApplication;
 import com.ld.qmwj.R;
 import com.ld.qmwj.client.MsgHandle;
@@ -82,6 +78,7 @@ import control.map.LiShiLuxian.RouteActivity;
 import control.map.overlayutil.DrivingRouteOverlay;
 import control.map.overlayutil.TransitRouteOverlay;
 import control.map.overlayutil.WalkingRouteOverlay;
+import under_control.home.map.MyOrientationListener;
 
 /**
  * 地图显示的碎片
@@ -490,6 +487,8 @@ public class MapFragment extends Fragment implements View.OnClickListener {
         super.onDestroy();
         //在activity执行onDestroy时执行mMapView.onDestroy()，实现地图生命周期管理
         mMapView.onDestroy();
+        // 释放地理编码检索实例
+        geoCoder.destroy();
     }
 
     @Override

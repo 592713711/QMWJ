@@ -10,9 +10,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
@@ -39,7 +41,10 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import under_control.home.service.FuctionService;
 
-public class MiBandActivity extends AppCompatActivity {
+/**
+ * 手环主界面
+ */
+public class MiBandActivity extends AppCompatActivity implements OnClickListener{
 
     private RelativeLayout headLayout;
     private RelativeLayout contentLayout;
@@ -82,6 +87,12 @@ public class MiBandActivity extends AppCompatActivity {
         hintText = (NumberView) findViewById(R.id.hintText);
         connecting_image = (BandConnectView) findViewById(R.id.connecting_icon);
 
+        ImageButton heart_btn= (ImageButton) findViewById(R.id.heart_btn);
+        heart_btn.setOnClickListener(this);
+
+        ImageButton search_btn= (ImageButton) findViewById(R.id.search_btn);
+        search_btn.setOnClickListener(this);
+
     }
 
     /**
@@ -118,9 +129,11 @@ public class MiBandActivity extends AppCompatActivity {
                 //显示电量
                 if (info != null) {
                     hintText.setTextSize(50);
+                    hintText.isAnim=true;
                     hintText.showNumberWithAnimation(info.getLevel());
 
                     // 更改电量外圆
+                    circleHintView.isAnim=true;
                     circleHintView.LevelToAnimator(info.getLevel());
                 }
                 band_btn.setText("断开连接");
@@ -174,24 +187,12 @@ public class MiBandActivity extends AppCompatActivity {
             FuctionService.miBand = new MiBand(MyApplication.getInstance());
             FuctionService.isConnectBand = MiBand.UNCONNECT;
             EventBus.getDefault().post(HandlerUtil.DISCONNECTBAND);
+            circleHintView.isAnim=false;
+            hintText.isAnim=false;
         }
     }
 
 
-    /**
-     * 震动
-     *
-     * @param view
-     */
-    public void Vibration(View view) {
-        //震动2次， 三颗led亮
-        miBand.startVibration(VibrationMode.VIBRATION_WITH_LED);
-        //震动2次, 没有led亮
-        //miband.startVibration(VibrationMode.VIBRATION_WITHOUT_LED);
-        //震动10次, 中间led亮蓝色
-        //miband.startVibration(VibrationMode.VIBRATION_10_TIMES_WITH_LED);
-
-    }
 
 
     /**
@@ -335,4 +336,41 @@ public class MiBandActivity extends AppCompatActivity {
     }
 
 
+    /**
+     *  按钮点击事件
+     * @param v
+     */
+    @Override
+    public void onClick(View v) {
+        int id=v.getId();
+        switch (id){
+            case R.id.heart_btn:
+                Intent intent=new Intent(this,HeartActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.search_btn:
+                doSearch();
+                break;
+        }
+
+    }
+
+    /**
+     *  查找手环  震动
+     */
+    private void doSearch() {
+        //震动2次， 三颗led亮
+        miBand.startVibration(VibrationMode.VIBRATION_WITH_LED);
+        //震动2次, 没有led亮
+        //miband.startVibration(VibrationMode.VIBRATION_WITHOUT_LED);
+        //震动10次, 中间led亮蓝色
+        //miband.startVibration(VibrationMode.VIBRATION_10_TIMES_WITH_LED);
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
+    }
 }

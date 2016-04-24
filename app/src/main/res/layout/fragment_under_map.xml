@@ -1,0 +1,52 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="under_control.home.map.UnderMapFragment">
+
+    <com.zhy.android.percent.support.PercentRelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".MainActivity">
+
+        <com.baidu.mapapi.map.MapView
+            android:id="@+id/bmapView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/bottom2"></com.baidu.mapapi.map.MapView>
+
+
+        <com.zhy.android.percent.support.PercentRelativeLayout
+            android:id="@+id/bottom2"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_alignParentBottom="true"
+            android:background="#ffffff"
+            app:layout_heightPercent="11%"
+            app:layout_widthPercent="100%">
+
+            <TextView
+                android:id="@+id/location_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="当前位置:"
+                app:layout_marginLeftPercent="5%"
+                app:layout_marginTopPercent="10%" />
+
+            <TextView
+                android:id="@+id/location_text2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="暂无位置信息"
+                android:textColor="#333333"
+                android:textSize="16sp"
+                app:layout_marginLeftPercent="5%"
+                app:layout_marginTopPercent="50%" />
+
+        </com.zhy.android.percent.support.PercentRelativeLayout>
+
+    </com.zhy.android.percent.support.PercentRelativeLayout>
+
+
+</FrameLayout>

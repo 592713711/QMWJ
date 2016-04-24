@@ -12,6 +12,8 @@ import java.util.concurrent.TimeUnit;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.handler.timeout.IdleState;
+import io.netty.handler.timeout.IdleStateEvent;
 
 public class MyClientHandler extends SimpleChannelInboundHandler<String> {
 
@@ -40,8 +42,6 @@ public class MyClientHandler extends SimpleChannelInboundHandler<String> {
         MsgHandle.getInstance().channel = ctx;
         // 发送自动登录消息
         MyApplication.getInstance().getSendMsgUtil().sendLoginRequest(null,null);
-        //发送缓存表消息
-        MyApplication.getInstance().getSendMsgUtil().sendCache();
         //发送给主线程 连接成功
         EventBus.getDefault().postSticky(HandlerUtil.CONNECT_SUC);
     }
@@ -64,4 +64,28 @@ public class MyClientHandler extends SimpleChannelInboundHandler<String> {
         EventBus.getDefault().postSticky(HandlerUtil.CONNECT_FAIL);
     }
 
+    @Override
+    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+        super.userEventTriggered(ctx, evt);
+        if (evt instanceof IdleStateEvent) {
+
+            IdleStateEvent event = (IdleStateEvent) evt;
+
+            if (event.state().equals(IdleState.READER_IDLE)) {
+
+
+            } else if (event.state().equals(IdleState.WRITER_IDLE)) {
+
+            } else if (event.state().equals(IdleState.ALL_IDLE)) {
+                // 未进行读写
+                //System.out.println("ALL_IDLE");
+                // 发送心跳消息  在客户端上实现心跳包的发送
+                //	MsgHandleService.getInstance().sendMsgUtil
+                //.sendHeartMessage(ctx);
+                MyApplication.getInstance().getSendMsgUtil().sendHeartMessage();
+
+            }
+
+        }
+    }
 }

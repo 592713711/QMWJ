@@ -252,4 +252,10 @@ public class MsgFragment extends Fragment implements View.OnClickListener, MyRec
             startActivity(intent);
         }
     }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
+    }
 }

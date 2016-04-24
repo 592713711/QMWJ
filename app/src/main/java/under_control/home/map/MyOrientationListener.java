@@ -1,4 +1,4 @@
-package control.map;
+package under_control.home.map;
 
 import android.content.Context;
 import android.hardware.Sensor;

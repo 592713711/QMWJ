@@ -11,6 +11,11 @@ public interface Config {
     public final static int GUARDIAN_STATUS = 0;	//监护
     public final static int NOT_GUARDIAN_STATUS = 1;	//被监护
 
+    //用户user相对于monitor的身份
+    public final static int UNDER_GUARDIAN = 0;     //被监护
+    public final static int MAIN_GUARDIAN = 1;	//主监护
+    public final static int VICE_GUARDIAN_STATUS = 2;	//副监护
+
     public final static int ONLINE_STATE=0;         //对方在线
     public final static int NOT_ONLINE_STATE=1;     //对方不在线
 

@@ -104,7 +104,7 @@ public class RouteActivity extends AppCompatActivity {
      * 请求历史路线
      */
     private void doRequestWay() {
-        boolean isExist = routeDao.tabbleIsExist(+monitor.id);
+        boolean isExist = routeDao.tabbleIsExist(monitor.id);
         Request request = new Request();
         request.from_id = MyApplication.getInstance().getSpUtil().getUser().id;
         request.into_id = monitor.id;

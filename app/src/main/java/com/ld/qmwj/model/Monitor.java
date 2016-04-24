@@ -11,7 +11,7 @@ public class Monitor implements Serializable{
     public int id;        //该对象id
     public String username;    //该对象用户名
     public String remark_name;        //该对象备注名
-    public int status;            //该对象身份
+    public int identify;            //用户user对于monitor的身份  0被监护方  1 主监护方  2 副监护
     public int icon;            //记录头像编号
     public int state;           //用户当前状态
 
@@ -21,7 +21,7 @@ public class Monitor implements Serializable{
                 "id=" + id +
                 ", username='" + username + '\'' +
                 ", remark_name='" + remark_name + '\'' +
-                ", status=" + status +
+                ", status=" + identify +
                 ", icon=" + icon +
                 ", state=" + state +
                 '}';

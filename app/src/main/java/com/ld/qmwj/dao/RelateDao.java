@@ -23,17 +23,19 @@ public class RelateDao {
     private static final String COL_MONITOR_ID = "monitor_id";      // 被监护人/监护人的id
     private static final String COL_MONITOR_NAME = "Monitor_name";          //
     private static final String COL_REMARK_NAME = "remark_name";       //备注名
+    private static final String COL_IDENTIFY= "identify";       //用户相对于该Monitor的身份   0被监护方  1 主监护方  2 副监护
     private static final String COL_ICON = "icon";          //头像id
     private static final String COL_LATITUDE = "latitude";          //最后一次定位纬度
     private static final String COL_LONGITUDE = "longitude";          //最后一次定位经度
     private static final String COL_TIME = "time";          //最后一次定位时间
     private static final String COL_STATE = "state";          //状态  在线 0  离线 1
-    private static final String[] COL_ALL = {COL_MONITOR_ID, COL_MONITOR_NAME, COL_REMARK_NAME, COL_ICON,COL_STATE};
+    private static final String[] COL_ALL = {COL_MONITOR_ID, COL_MONITOR_NAME, COL_REMARK_NAME, COL_ICON,COL_STATE,COL_IDENTIFY};
     public static final String SQL_CREATE_TABLE = String.format(
-            "CREATE table IF NOT EXISTS %s(%s integer,%s text,%s text,%s integer,%s text default '0',%s text default '0',%s text default '0',%s integer)",
+            "CREATE table IF NOT EXISTS %s(%s integer,%s text,%s integer,%s text,%s integer,%s text default '0',%s text default '0',%s text default '0',%s integer)",
             TABLE_NAME,
             COL_MONITOR_ID,
             COL_MONITOR_NAME,
+            COL_IDENTIFY,
             COL_REMARK_NAME,
             COL_ICON,
             COL_LATITUDE,
@@ -41,6 +43,13 @@ public class RelateDao {
             COL_TIME,
             COL_STATE
     );
+
+    //删除表语句
+    public static final String SQL_DROP_TABLE = String.format(
+            "drop table if exists %s",
+            TABLE_NAME
+    );
+
 
     private DBHelper helper;
     private SQLiteDatabase db;
@@ -65,6 +74,7 @@ public class RelateDao {
             values.put(COL_MONITOR_ID, monitor.id);
             values.put(COL_MONITOR_NAME, monitor.username);
             values.put(COL_REMARK_NAME, monitor.remark_name);
+            values.put(COL_IDENTIFY,monitor.identify);
             values.put(COL_ICON, 0);
             values.put(COL_STATE,monitor.state);
             Log.d(Config.TAG, "插入数据:" + monitor.toString());
@@ -86,6 +96,7 @@ public class RelateDao {
             m.remark_name = cursor.getString(2);
             m.icon = cursor.getInt(3);
             m.state = cursor.getInt(4);
+            m.identify=cursor.getInt(5);
             list.add(m);
 
         }
@@ -117,7 +128,7 @@ public class RelateDao {
             m.remark_name = cursor.getString(2);
             m.icon = cursor.getInt(3);
             m.state = cursor.getInt(4);
-
+            m.identify=cursor.getInt(5);
         }
         cursor.close();
         return m;

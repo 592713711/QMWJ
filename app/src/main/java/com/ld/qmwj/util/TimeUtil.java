@@ -4,7 +4,8 @@ import android.util.Log;
 
 import com.ld.qmwj.Config;
 
-import java.sql.Date;
+import java.util.Date;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
@@ -45,6 +46,77 @@ public class TimeUtil {
         }
     }
 
+    public static String getTimeStr3(long oldTime) {
+        SimpleDateFormat sdf = new SimpleDateFormat("MM月dd日 HH:mm");
+        return sdf.format(oldTime);
+    }
+
+    public static String getTimeStr4(long oldTime) {
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+        return sdf.format(oldTime);
+    }
+
+    /**
+     * 得到指定日期的零点
+     * 通过时间字符串来得到long类型时间
+     * @param timeStr
+     * @return
+     */
+    public static long timeStrToLong(String timeStr) {
+        timeStr+=" 00:00:00";
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            Date date=sdf.parse(timeStr);
+            return date.getTime();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+
+    /**
+     * 得到指定日期的 23:59:59
+     * 通过时间字符串来得到long类型时间
+     * @param timeStr
+     * @return
+     */
+    public static long timeStrToLong2(String timeStr) {
+        timeStr+=" 23:59:59";
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            Date date=sdf.parse(timeStr);
+            return date.getTime();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+
+    /**
+     * 得到指定日期7天前的 00:00:00
+     * @param timeStr
+     * @return
+     */
+    public static long timeStrToLong_agoseven(String timeStr){
+        long time=timeStrToLong(timeStr);       //先得到当天凌晨时间
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date(time));
+        calendar.add(Calendar.DAY_OF_MONTH, -6);        //得到以time为基准 得到六天前的0点时间 因为当天也算一天
+        return calendar.getTime().getTime();
+
+    }
+
+
+    //得到当前时间的日期
+    public static String getNowDateStr(){
+        Date date=new Date(System.currentTimeMillis());
+        SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd");
+        String s=format.format(date);
+        // Log.d(Config.TAG,"日期："+s);
+        return s;
+    }
 
     /**
      * 将秒数转化为时间

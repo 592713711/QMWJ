@@ -40,6 +40,9 @@ import java.util.HashMap;
 
 import under_control.home.service.FuctionService;
 
+/**
+ * 扫秒蓝牙设备  绑定手环活动
+ */
 public class BindBandActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
     private ListView device_list;
