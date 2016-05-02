@@ -24,5 +24,7 @@
     <string name="title_activity_mi_band">MiBandActivity</string>
     <string name="title_activity_bind_band">BindBandActivity</string>
     <string name="title_activity_heart_data">HeartDataActivity</string>
+    <string name="title_activity_add_location_range">AddLocationRangeActivity</string>
+    <string name="title_activity_location_range">LocationRangeActivity</string>
 
 </resources>

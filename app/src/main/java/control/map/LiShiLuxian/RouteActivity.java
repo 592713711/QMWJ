@@ -164,10 +164,12 @@ public class RouteActivity extends AppCompatActivity {
 
         MapStatusUpdate msu = MapStatusUpdateFactory.newLatLng(routeData.get(0));   //设置位置（经度和纬度）
         mBaidumap.animateMapStatus(msu);      //使用动画的方式更新地图  不是瞬间跳到当前的位置 而是有个动画移动的效果
-        //绘制历史路线图
-        OverlayOptions ooPolyline = new PolylineOptions().width(8)
-                .color(Color.BLUE).points(routeData);
-        mBaidumap.addOverlay(ooPolyline);
+        if (routeData.size() >= 2) {
+            //绘制历史路线图
+            OverlayOptions ooPolyline = new PolylineOptions().width(8)
+                    .color(Color.BLUE).points(routeData);
+            mBaidumap.addOverlay(ooPolyline);
+        }
 
 
     }

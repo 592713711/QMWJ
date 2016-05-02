@@ -2,8 +2,8 @@ package com.ld.qmwj;
 
 
 public interface Config {
-    public final static String serverIP="192.168.191.1";
-  //  public final static String serverIP="172.30.18.211";      //服务器地址
+   // public final static String serverIP="192.168.191.1";
+   public final static String serverIP="192.168.232.157";      //服务器地址
     public final static int port=10245;       //服务器端口
     public final static String TAG="QMWJ";
 
@@ -45,6 +45,11 @@ public interface Config {
     public final static int CALL_MSG=2;       //监听电话提醒
     public final static int SMS_MSG=3;        //监听短信提醒
     public final static int MAPWAY_MSG=4;     //地图路线提醒
+
+    //安全区域范围
+    public final static int MINRANG=50;
+    public final static int MAXRANG=2000;
+
 
 
 

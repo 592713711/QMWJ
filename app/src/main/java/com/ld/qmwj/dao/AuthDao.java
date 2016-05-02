@@ -6,7 +6,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.ld.qmwj.Config;
+import com.ld.qmwj.MyApplication;
 import com.ld.qmwj.model.Authority;
+import com.ld.qmwj.model.LocationRange;
 import com.ld.qmwj.model.Monitor;
 
 import java.util.ArrayList;
@@ -80,16 +82,19 @@ public class AuthDao {
      */
     public void initAuth(int id, Authority authority) {
         //清除该id数据
-        db.delete(TABLE_NAME,COL_MONITOR_ID+"="+id,null);
+        db.delete(TABLE_NAME, COL_MONITOR_ID + "=" + id, null);
         ContentValues values = new ContentValues();
-        values.put(COL_MONITOR_ID,id);
-        values.put(COL_LOCATION_AUTH,authority.location_auth);
-        values.put(COL_LOCATION_RANGE1,authority.loation_range1);
-        values.put(COL_LOCATION_RANGE2,authority.loation_range2);
-        values.put(COL_LOCATION_RANGE3,authority.loation_range3);
-        values.put(COL_CALL_AUTH,authority.call_auth);
-        values.put(COL_SMS_AUTH,authority.sms_auth);
-        db.insert(TABLE_NAME,null,values);
+        values.put(COL_MONITOR_ID, id);
+        values.put(COL_LOCATION_AUTH, authority.location_auth);
+        if (authority.loation_range1 != null)
+            values.put(COL_LOCATION_RANGE1, authority.loation_range1);
+        if (authority.loation_range2 != null)
+            values.put(COL_LOCATION_RANGE2, authority.loation_range2);
+        if (authority.loation_range3 != null)
+            values.put(COL_LOCATION_RANGE3, authority.loation_range3);
+        values.put(COL_CALL_AUTH, authority.call_auth);
+        values.put(COL_SMS_AUTH, authority.sms_auth);
+        db.insert(TABLE_NAME, null, values);
     }
 
 
@@ -121,5 +126,100 @@ public class AuthDao {
         }
         cursor.close();
         return auth;
+    }
+
+
+    /**
+     * 更新安全区域
+     *
+     * @param monitor_id
+     * @param locationRange
+     */
+    public void updateLacationRange(int monitor_id, LocationRange locationRange) {
+        String col_range = COL_LOCATION_RANGE1;
+        switch (locationRange.rang_pos) {
+            case 0:
+                col_range = COL_LOCATION_RANGE1;
+                break;
+            case 1:
+                col_range = COL_LOCATION_RANGE2;
+                break;
+            case 2:
+                col_range = COL_LOCATION_RANGE3;
+                break;
+        }
+        ContentValues values = new ContentValues();
+        values.put(col_range, MyApplication.getInstance().getGson().toJson(locationRange));
+        db.update(TABLE_NAME, values, COL_MONITOR_ID + "=" + monitor_id, null);
+    }
+
+    public ArrayList<LocationRange> getLocationRanges(int monitor_id) {
+        ArrayList<LocationRange> datas = new ArrayList<>();
+        Cursor cursor = db.query(TABLE_NAME, new String[]{COL_LOCATION_RANGE1, COL_LOCATION_RANGE2, COL_LOCATION_RANGE3},
+                COL_MONITOR_ID + "=" + monitor_id, null, null, null, null);
+        if (cursor.moveToNext()) {
+            if (cursor.getString(0) != null) {
+                LocationRange locationRange = MyApplication.getInstance().getGson().fromJson(cursor.getString(0), LocationRange.class);
+                datas.add(locationRange);
+            }
+
+            if (cursor.getString(1) != null) {
+                LocationRange locationRange = MyApplication.getInstance().getGson().fromJson(cursor.getString(1), LocationRange.class);
+                datas.add(locationRange);
+            }
+
+            if (cursor.getString(2) != null) {
+                LocationRange locationRange = MyApplication.getInstance().getGson().fromJson(cursor.getString(2), LocationRange.class);
+                datas.add(locationRange);
+            }
+        }
+
+        return datas;
+
+    }
+
+    public int getEmptyPosition(int monitor_id) {
+        Cursor cursor = db.query(TABLE_NAME, new String[]{COL_LOCATION_RANGE1, COL_LOCATION_RANGE2, COL_LOCATION_RANGE3},
+                COL_MONITOR_ID + "=" + monitor_id, null, null, null, null);
+        if (cursor.moveToNext()) {
+            if (cursor.getString(0) == null) {
+                return 0;
+            }
+
+            if (cursor.getString(1) == null) {
+                return 1;
+            }
+
+            if (cursor.getString(2) == null) {
+                return 2;
+            }
+
+        }
+        return -1;
+    }
+
+
+    /**
+     * 删除指定位置的安全信息
+     *
+     * @param id
+     * @param rang_pos
+     */
+    public void removeLocationRange(int id, int rang_pos) {
+        ContentValues values = new ContentValues();
+        String col_range = COL_LOCATION_RANGE1;
+        switch (rang_pos) {
+            case 0:
+                col_range = COL_LOCATION_RANGE1;
+                break;
+            case 1:
+                col_range = COL_LOCATION_RANGE2;
+                break;
+            case 2:
+                col_range = COL_LOCATION_RANGE3;
+                break;
+        }
+        String sql = "update " + TABLE_NAME + " set " + col_range + "=null where monitor_id=" + id;
+        db.execSQL(sql);
     }
 }

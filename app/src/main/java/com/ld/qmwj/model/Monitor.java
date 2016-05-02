@@ -21,7 +21,7 @@ public class Monitor implements Serializable{
                 "id=" + id +
                 ", username='" + username + '\'' +
                 ", remark_name='" + remark_name + '\'' +
-                ", status=" + identify +
+                ", identify=" + identify +
                 ", icon=" + icon +
                 ", state=" + state +
                 '}';

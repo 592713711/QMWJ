@@ -152,6 +152,14 @@
             android:name="control.phone.health.Control_HeartDataActivity"
             android:label="@string/title_activity_heart_data" >
         </activity>
+        <activity
+            android:name="control.map.locationRange.AddLocationRangeActivity"
+            android:label="@string/title_activity_add_location_range" >
+        </activity>
+        <activity
+            android:name="control.map.locationRange.LocationRangeActivity"
+            android:label="@string/title_activity_location_range" >
+        </activity>
     </application>
 
 </manifest>

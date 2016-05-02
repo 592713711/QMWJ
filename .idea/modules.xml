@@ -7,7 +7,6 @@
       <module fileurl="file://$PROJECT_DIR$/libraries/libraries.iml" filepath="$PROJECT_DIR$/libraries/libraries.iml" />
       <module fileurl="file://$PROJECT_DIR$/libraries/library/library.iml" filepath="$PROJECT_DIR$/libraries/library/library.iml" />
       <module fileurl="file://$PROJECT_DIR$/libraries/miband-sdk/miband-sdk.iml" filepath="$PROJECT_DIR$/libraries/miband-sdk/miband-sdk.iml" />
-      <module fileurl="file://$PROJECT_DIR$/libraries/miband-sdk/miband-sdk.iml" filepath="$PROJECT_DIR$/libraries/miband-sdk/miband-sdk.iml" />
     </modules>
   </component>
 </project>

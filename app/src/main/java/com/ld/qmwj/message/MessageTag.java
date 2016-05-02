@@ -62,6 +62,10 @@ public class MessageTag {
     //权限
     public static final int AUTH_MSG=24;
     public static final int AUTH_CHANGE=25;
+    //安全范围更改请求
+    public static final int LOCATIONRANGE_REQ=26;
+    //删除安全区域请求
+    public static final int REMOVERANGE_REQ=27;
 
 
 }

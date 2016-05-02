@@ -12,7 +12,9 @@ import android.graphics.Point;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.Message;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,6 +38,7 @@ import com.baidu.mapapi.SDKInitializer;
 import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.BitmapDescriptor;
 import com.baidu.mapapi.map.BitmapDescriptorFactory;
+import com.baidu.mapapi.map.CircleOptions;
 import com.baidu.mapapi.map.InfoWindow;
 import com.baidu.mapapi.map.MapPoi;
 import com.baidu.mapapi.map.MapStatusUpdate;
@@ -46,6 +49,7 @@ import com.baidu.mapapi.map.MarkerOptions;
 import com.baidu.mapapi.map.MyLocationConfiguration;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.map.OverlayOptions;
+import com.baidu.mapapi.map.PolygonOptions;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.model.inner.GeoPoint;
 import com.baidu.mapapi.search.core.SearchResult;
@@ -64,17 +68,24 @@ import com.baidu.mapapi.search.route.TransitRoutePlanOption;
 import com.baidu.mapapi.search.route.TransitRouteResult;
 import com.baidu.mapapi.search.route.WalkingRoutePlanOption;
 import com.baidu.mapapi.search.route.WalkingRouteResult;
+import com.baidu.mapapi.utils.SpatialRelationUtil;
+import com.ld.qmwj.Config;
 import com.ld.qmwj.MyApplication;
 import com.ld.qmwj.R;
 import com.ld.qmwj.client.MsgHandle;
+import com.ld.qmwj.model.LocationRange;
 import com.ld.qmwj.model.Monitor;
 import com.ld.qmwj.model.MyLocation;
 import com.ld.qmwj.util.HandlerUtil;
 import com.ld.qmwj.util.TimeUtil;
 import com.ld.qmwj.util.WaitDialog;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import control.home.MonitorActivity;
 import control.map.LiShiLuxian.RouteActivity;
+import control.map.locationRange.AddLocationRangeActivity;
 import control.map.overlayutil.DrivingRouteOverlay;
 import control.map.overlayutil.TransitRouteOverlay;
 import control.map.overlayutil.WalkingRouteOverlay;
@@ -99,7 +110,7 @@ public class MapFragment extends Fragment implements View.OnClickListener {
     private MyLocation mLocation;           //被监护方位置
     private LatLng currentLocation;         //当前用户位置
 
-    private BitmapDescriptor mLocationIcon; //定位的图标
+    private BitmapDescriptor monitor_icon; //定位的图标
     private float mCurrentx;             //当前位置 x方向的值
     private MyLocationConfiguration.LocationMode mLocationModel;         //定位模式
 
@@ -136,6 +147,8 @@ public class MapFragment extends Fragment implements View.OnClickListener {
     //传感器
     MyOrientationListener myOrientationListener;        //自定义方向传感器监听器 内部已经实现了传感器的初始化
 
+    //安全区域
+    ArrayList<LocationRange> rangeList;
 
     public Handler handler = new Handler() {
         @Override
@@ -171,6 +184,7 @@ public class MapFragment extends Fragment implements View.OnClickListener {
         //注意该方法要再setContentView方法之前实现
         SDKInitializer.initialize(MyApplication.getInstance());
         initGeoCoder();
+
         initData();
 
     }
@@ -181,8 +195,8 @@ public class MapFragment extends Fragment implements View.OnClickListener {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_map, container, false);
         initView(view);
+        initAnim();
         centerToMyPosition();
-
         return view;
     }
 
@@ -236,9 +250,7 @@ public class MapFragment extends Fragment implements View.OnClickListener {
         BitmapFactory.Options opts = new BitmapFactory.Options();
         //缩放的比例，缩放是很难按准备的比例进行缩放的，其值表明缩放的倍数，SDK中建议其值是2的指数值,值越大会导致图片不清晰
         opts.inSampleSize = 1;
-        Bitmap bmp = null;
-        bmp = BitmapFactory.decodeResource(getResources(), R.drawable.location_icon);
-        mLocationIcon = BitmapDescriptorFactory.fromBitmap(bmp);
+        monitor_icon = BitmapDescriptorFactory.fromResource(R.drawable.head_1);
 
         //初始化路线
         routePlanSearch = RoutePlanSearch.newInstance();
@@ -248,7 +260,8 @@ public class MapFragment extends Fragment implements View.OnClickListener {
         //先加载数据库中的位置
         mLocation = MyApplication.getInstance().getRelateDao().getLocation(monitor.id);
 
-
+        //更新监护区
+        updateRange();
     }
 
 
@@ -256,7 +269,7 @@ public class MapFragment extends Fragment implements View.OnClickListener {
         mMapView = (MapView) view.findViewById(R.id.bmapView);
         mBaidumap = mMapView.getMap();
         //设置缩放等级 zoomTo
-        MapStatusUpdate msu = MapStatusUpdateFactory.zoomTo(15.0f);
+        MapStatusUpdate msu = MapStatusUpdateFactory.zoomTo(16.0f);
         mBaidumap.setMapStatus(msu);        //设置地图状态
         mBaidumap.setMyLocationEnabled(true);
         mMapView.removeViewAt(2);           //隐藏地图上比例尺
@@ -401,18 +414,19 @@ public class MapFragment extends Fragment implements View.OnClickListener {
                 .longitude(mLocation.longitude)
                 .build();
 
-        // 设置当前位置定位数据
-        mBaidumap.setMyLocationData(data);
-        //设置当前位置的图标
-        MyLocationConfiguration config = new MyLocationConfiguration(
-                mLocationModel,       //设置定位模式
-                true, mLocationIcon);
-        mBaidumap.setMyLocationConfigeration(config);
+        OverlayOptions option = new MarkerOptions()
+                .icon(monitor_icon)
+                .anchor(0.5f, 0.5f)      //中心点对齐对齐坐标的中心点
+                .position(new LatLng(mLocation.latitude, mLocation.longitude));
+        mBaidumap.addOverlay(option);
 
-        //LatLng latLng = new LatLng(28.138451,113.000645);
+
         LatLng latLng = new LatLng(mLocation.latitude, mLocation.longitude);
         MapStatusUpdate msu = MapStatusUpdateFactory.newLatLng(latLng);   //设置位置（经度和纬度）
         mBaidumap.animateMapStatus(msu);      //使用动画的方式更新地图  不是瞬间跳到当前的位置 而是有个动画移动的效果
+
+        //绘制监护区
+        drawRangArea();
 
         //更新底部显示的位置信息
         // 反地理编码  通过坐标查位置
@@ -496,8 +510,10 @@ public class MapFragment extends Fragment implements View.OnClickListener {
         super.onResume();
         //在activity执行onResume时执行mMapView. onResume ()，实现地图生命周期管理
         mMapView.onResume();
-
+        updateRange();
+        centerToMyPosition();
     }
+
 
     private boolean isFirst = true;
 
@@ -516,7 +532,9 @@ public class MapFragment extends Fragment implements View.OnClickListener {
             isFirst = false;
         }
 
+
     }
+
 
     @Override
     public void onPause() {
@@ -551,8 +569,19 @@ public class MapFragment extends Fragment implements View.OnClickListener {
         mBaidumap.clear();
         mBaidumap.setOnMapClickListener(mapClickLis);
         isSelect = true;
+
+        //绘制被监护方坐标
+        OverlayOptions option = new MarkerOptions()
+                .icon(monitor_icon)
+                .anchor(0.5f, 0.5f)      //中心点对齐对齐坐标的中心点
+                .position(new LatLng(mLocation.latitude, mLocation.longitude));
+
+        mBaidumap.addOverlay(option);
     }
 
+    /**
+     * 退出路线查询
+     */
     public void doBack() {
         //动画的方式隐藏布局文件
         Animation anmi = AnimationUtils.loadAnimation(monitorActivity, R.anim.head_out);
@@ -567,6 +596,7 @@ public class MapFragment extends Fragment implements View.OnClickListener {
         isSelect = false;
         mBaidumap.setOnMapClickListener(null);
         mBaidumap.clear();
+        centerToMyPosition();
 
     }
 
@@ -646,6 +676,9 @@ public class MapFragment extends Fragment implements View.OnClickListener {
                 break;
             case R.id.protect_btn:
                 more_btn.setChecked(false);
+                Intent intent2 = new Intent(monitorActivity, AddLocationRangeActivity.class);
+                intent2.putExtra("monitor", monitor);
+                startActivity(intent2);
                 break;
 
         }
@@ -821,7 +854,7 @@ public class MapFragment extends Fragment implements View.OnClickListener {
         });
         mInfoWindow = new InfoWindow(v, selectLatLng, -47);
         //显示InfoWindow
-        // mBaidumap.showInfoWindow(mInfoWindow);
+        mBaidumap.showInfoWindow(mInfoWindow);
 
     }
 
@@ -847,6 +880,112 @@ public class MapFragment extends Fragment implements View.OnClickListener {
             marker = (Marker) mBaidumap.addOverlay(options);
             // 反地理编码  通过坐标查位置
             searchWay(currentLocation);
+        }
+    }
+
+
+    private BitmapDescriptor mLocationIcon1;
+    private BitmapDescriptor mLocationIcon2;
+    private BitmapDescriptor mLocationIcon3;
+    private BitmapDescriptor mLocationIcon4;
+    private BitmapDescriptor mLocationIcon5;
+    private BitmapDescriptor mLocationIcon6;
+    private ArrayList<BitmapDescriptor> bitmapList;
+
+    /**
+     * 初始化动态图标
+     */
+    public void initAnim() {
+        mLocationIcon1 = BitmapDescriptorFactory.fromResource(R.drawable.red1);
+        mLocationIcon2 = BitmapDescriptorFactory.fromResource(R.drawable.red2);
+        mLocationIcon3 = BitmapDescriptorFactory.fromResource(R.drawable.red3);
+        mLocationIcon4 = BitmapDescriptorFactory.fromResource(R.drawable.red4);
+        mLocationIcon5 = BitmapDescriptorFactory.fromResource(R.drawable.red5);
+        //  mLocationIcon6 = BitmapDescriptorFactory.fromResource(R.drawable.head6);
+        bitmapList = new ArrayList<>();
+        bitmapList.add(mLocationIcon1);
+        bitmapList.add(mLocationIcon2);
+        bitmapList.add(mLocationIcon3);
+        bitmapList.add(mLocationIcon4);
+        bitmapList.add(mLocationIcon5);
+        //     bitmapList.add(mLocationIcon6);
+//
+        //  new Thread(runnable).start();
+    }
+
+    /**
+     * 更新监护区
+     */
+    private void updateRange() {
+        rangeList = MyApplication.getInstance().getAuthDao().getLocationRanges(monitor.id);
+    }
+
+    /**
+     * 绘制监护区
+     */
+    public void drawRangArea() {
+        boolean isContains = false;
+        LatLng latLng = new LatLng(mLocation.latitude, mLocation.longitude);
+        for (LocationRange range : rangeList) {
+            if (range.latLng != null) {
+                isContains = SpatialRelationUtil.isCircleContainsPoint(range.latLng, range.range, latLng);
+                drawCircle(range.latLng, range.range);
+            } else {
+                isContains = SpatialRelationUtil.isPolygonContainsPoint(range.points, latLng);
+                drawPolygon(range.points);
+            }
+
+            if (isContains)
+                break;
+        }
+
+        if (!isContains) {
+            //将所有监护区域都绘制出来
+            for (LocationRange range : rangeList) {
+                if (range.latLng != null) {
+                    drawCircle(range.latLng, range.range);
+                } else {
+                    drawPolygon(range.points);
+                }
+            }
+        }
+
+        OverlayOptions option = new MarkerOptions()
+                .icons(bitmapList)
+                .period(25)        //设置多少帧刷新一次图片资源
+                .anchor(0.5f, 0.5f)      //中心点对齐对齐坐标的中心点
+                .position(new LatLng(mLocation.latitude, mLocation.longitude));
+
+        mBaidumap.addOverlay(option);
+
+    }
+
+    /**
+     * 绘制圆形区域
+     * 圆形  半径
+     */
+    public void drawCircle(LatLng latLng, int range) {
+        if (latLng != null) {
+
+            CircleOptions options_circle = new CircleOptions();
+            options_circle.center(latLng);
+            options_circle.radius(range);
+            options_circle.fillColor(Color.argb(50, 99, 202, 248));
+            mBaidumap.addOverlay(options_circle);
+        }
+    }
+
+    /**
+     * 绘制多边形区域
+     */
+    public void drawPolygon(List<LatLng> points) {
+        if (points.size() > 2) {
+            //构建用户绘制多边形  可以填充
+            OverlayOptions polygonOption = new PolygonOptions()
+                    .points(points)
+                    .fillColor(Color.argb(50, 99, 202, 248));
+            //在地图上添加多边形Option，用于显示
+            mBaidumap.addOverlay(polygonOption);
         }
     }
 }

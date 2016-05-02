@@ -1,0 +1,255 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipToPadding="true"
+    android:fitsSystemWindows="true"
+    tools:context="control.phone.linkman.LinkManActivity">
+
+    <android.support.design.widget.CoordinatorLayout
+        android:id="@+id/coordinatorLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.zhy.android.percent.support.PercentRelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+
+            <com.baidu.mapapi.map.MapView
+                android:id="@+id/bmapView"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_above="@+id/bottom2"
+                android:layout_below="@id/head"
+                app:layout_heightPercent="100%"
+                app:layout_widthPercent="100%" />
+
+            <com.zhy.android.percent.support.PercentRelativeLayout
+                android:id="@+id/location_msg_content"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/head"
+                android:background="#ffffff"
+                app:layout_widthPercent="100%">
+
+                <ImageView
+                    android:id="@+id/view"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginTop="15dp"
+                    android:src="@drawable/note" />
+
+                <EditText
+                    android:id="@+id/mark_edit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBottom="@+id/view"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_toEndOf="@+id/view"
+                    android:hint="备注"
+                    android:paddingBottom="13dp"
+                    android:singleLine="true"
+                    android:textColor="@color/statusbar_bg"
+                    android:textSize="15sp" />
+
+                <ImageView
+                    android:id="@+id/view2"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_alignStart="@+id/view"
+                    android:layout_below="@+id/view"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginTop="10dp"
+                    android:src="@drawable/note_location" />
+
+                <TextView
+                    android:id="@+id/location_msg"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignStart="@+id/mark_edit"
+                    android:layout_alignTop="@+id/view2"
+                    android:layout_marginTop="7dp"
+                    android:layout_toEndOf="@+id/view2"
+                    android:text="湖南长沙中南林业科技大学" />
+
+            </com.zhy.android.percent.support.PercentRelativeLayout>
+
+
+            <com.zhy.android.percent.support.PercentRelativeLayout
+                android:id="@+id/head"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="#29b6f6"
+                app:layout_heightPercent="7%"
+                app:layout_widthPercent="100%">
+
+                <TextView
+                    android:id="@+id/title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerVertical="true"
+                    android:text="安全区域"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="@android:color/white"
+                    android:textSize="20sp"
+                    app:layout_marginTopPercent="20%" />
+
+                <ImageButton
+                    android:id="@+id/quit_btn"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_centerVertical="true"
+                    android:background="#00000000"
+                    android:onClick="doQuit"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/quit_btn"
+                    app:layout_heightPercent="60%h"
+                    app:layout_marginLeftPercent="3%"
+                    app:layout_widthPercent="60%h" />
+
+                <TextView
+                    android:id="@+id/search_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginRight="10dp"
+                    android:gravity="center"
+                    android:text="搜索"
+                    android:textColor="@android:color/white"
+                    android:textSize="18sp"
+
+                    />
+
+            </com.zhy.android.percent.support.PercentRelativeLayout>
+
+
+            <com.zhy.android.percent.support.PercentRelativeLayout
+                android:id="@+id/bottom"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:background="#ffffff"
+                app:layout_widthPercent="100%">
+
+                <TextView
+                    android:id="@+id/text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="7dp"
+                    android:text="区域范围"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:id="@+id/cancel_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignTop="@+id/text"
+                    android:layout_marginLeft="20dp"
+                    android:text="取消"
+                    android:textColor="#6ec3e8" />
+
+                <TextView
+                    android:id="@+id/sure_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignTop="@+id/text"
+                    android:layout_marginRight="20dp"
+                    android:text="确定"
+                    android:textColor="#6ec3e8" />
+
+                <TextView
+                    android:id="@+id/radius_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_below="@+id/text"
+                    android:layout_marginBottom="15dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_marginTop="15dp"
+                    android:text="500米"
+                    android:textColor="@android:color/black"
+                    android:textSize="16sp" />
+
+                <SeekBar
+                    android:id="@+id/seekbar_range"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignTop="@+id/radius_text"
+                    android:layout_marginLeft="3dp"
+                    android:layout_marginTop="-4dp"
+                    android:layout_toStartOf="@+id/radius_text"
+                    android:maxHeight="4.0dip"
+                    android:minHeight="4.0dip"
+                    android:progressDrawable="@drawable/seekbar_img"
+                    android:thumb="@drawable/seekbar_thumb" />
+            </com.zhy.android.percent.support.PercentRelativeLayout>
+
+
+            <com.zhy.android.percent.support.PercentRelativeLayout
+                android:id="@+id/bottom2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:background="#ffffff"
+                android:visibility="gone"
+                app:layout_widthPercent="100%">
+
+                <TextView
+                    android:id="@+id/cancel_btn2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="20dp"
+                    android:text="取消"
+                    android:textColor="#6ec3e8" />
+
+                <TextView
+                    android:id="@+id/sure_btn2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignTop="@+id/cancel_btn2"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="20dp"
+                    android:text="确定"
+                    android:textColor="#6ec3e8" />
+
+                <ImageButton
+                    android:id="@+id/undo_btn"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_toStartOf="@+id/sure_btn2"
+                    android:background="#00000000"
+                    android:src="@drawable/undo_btn"
+
+                    />
+
+            </com.zhy.android.percent.support.PercentRelativeLayout>
+
+
+            <CheckBox
+                android:id="@+id/draw_btn"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentEnd="true"
+                android:background="@drawable/draw_btn_bg"
+                android:button="@null"
+                app:layout_marginBottomPercent="20%"
+                app:layout_marginRightPercent="5%" />
+
+
+        </com.zhy.android.percent.support.PercentRelativeLayout> 
+    </android.support.design.widget.CoordinatorLayout>
+</RelativeLayout>
+
