@@ -1,7 +1,5 @@
 package com.ld.qmwj.client;
 
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -13,14 +11,11 @@ import com.ld.qmwj.message.request.ChatRequest;
 import com.ld.qmwj.message.response.LoginResponse;
 import com.ld.qmwj.message.response.RefreshListRes;
 import com.ld.qmwj.message.response.Response;
-import com.ld.qmwj.model.chatmessage.ChatMessage;
 import com.ld.qmwj.model.chatmessage.SimpleMsg;
 import com.ld.qmwj.util.HandlerUtil;
 import com.ld.qmwj.util.SharePreferenceUtil;
 
 import org.greenrobot.eventbus.EventBus;
-
-import java.util.HashMap;
 
 import io.netty.channel.ChannelHandlerContext;
 
@@ -65,7 +60,7 @@ public class MsgHandle {
                 break;
             case MessageTag.HEART_MSG:
                 //发送心跳消息
-               // Log.d(Config.TAG, "收到心跳消息");
+                // Log.d(Config.TAG, "收到心跳消息");
                 MyApplication.getInstance().getSendMsgUtil().sendHeartMessage();
                 break;
             case MessageTag.LOCATION_REQ:
@@ -123,6 +118,25 @@ public class MsgHandle {
             case MessageTag.AUTH_MSG:       //权限消息
                 handleAuth(msgJson);
                 break;
+            case MessageTag.ROUTEWAY_REQ:   //收到监护方发来的地图路线消息
+                msgHandle_under.handleRouteWay(msgJson);
+                break;
+            case MessageTag.ADDBLACKPHONE_REQ:  //收到监护方发来的添加黑名单消息
+                msgHandle_under.handleAddBlackPhone(msgJson);
+                break;
+            case MessageTag.DELETEBLACKPHONE_REQ:  //收到监护方发来的删除黑名单消息
+                msgHandle_under.handleDeleteBlackPhone(msgJson);
+                break;
+            case MessageTag.ADDLINKMAN_REQ: //收到监护方发来的添加联系人消息
+            case MessageTag.DELETELINKMAN_REQ:  //删除联系人
+            case MessageTag.UPDATELINKMAN_REQ:  //修改联系人
+                msgHandle_under.handleAlterLinkMan(msgJson);
+                break;
+            case MessageTag.ADDALARM_REQ:       //收到监护方添加闹钟
+            case MessageTag.DELETEALARM_REQ:    //删除闹钟
+            case MessageTag.UPDATEALARM_REQ:    //更新闹钟
+                msgHandle_under.handleAlterAlarm(msgJson);
+                break;
 
         }
     }
@@ -130,28 +144,30 @@ public class MsgHandle {
 
     /**
      * 处理权限消息
+     *
      * @param msgJson
      */
     private void handleAuth(String msgJson) {
-        AuthMessage authMessage=gson.fromJson(msgJson,AuthMessage.class);
+        AuthMessage authMessage = gson.fromJson(msgJson, AuthMessage.class);
         //将权限写入权限表
-        MyApplication.getInstance().getAuthDao().initAuth(authMessage.from_id,authMessage.authority);
+        MyApplication.getInstance().getAuthDao().initAuth(authMessage.from_id, authMessage.authority);
         EventBus.getDefault().post(HandlerUtil.AUTH_MSG);
     }
 
     /**
      * 处理文本聊天信息
+     *
      * @param msgJson
      */
     private void handleChat(String msgJson) {
-        ChatRequest request=gson.fromJson(msgJson,ChatRequest.class);
-        SimpleMsg simpleMsg=new SimpleMsg();
-        simpleMsg.is_coming=Config.FROM_MSG;
-        simpleMsg.time=request.time;
-        simpleMsg.msg=request.msg;
-        MyApplication.getInstance().getMessageDao().addMessage(request.from_id,simpleMsg,simpleMsg.msg);
+        ChatRequest request = gson.fromJson(msgJson, ChatRequest.class);
+        SimpleMsg simpleMsg = new SimpleMsg();
+        simpleMsg.is_coming = Config.FROM_MSG;
+        simpleMsg.time = request.time;
+        simpleMsg.msg = request.msg;
+        MyApplication.getInstance().getMessageDao().addMessage(request.from_id, simpleMsg, simpleMsg.msg);
 
-        EventBus.getDefault().post(HandlerUtil.CAHT_UPDATE);
+        EventBus.getDefault().post(HandlerUtil.CHAT_UPDATE);
 
     }
 
@@ -183,17 +199,16 @@ public class MsgHandle {
                 if (loginRes.user != null) {
                     //正常登陆
                     MyApplication.getInstance().getRelateDao().addList(refreshListRes.monitorList);
-                    if(spUtil.getUser().status==Config.GUARDIAN_STATUS){
+                    if (spUtil.getUser().status == Config.GUARDIAN_STATUS) {
                         //当前用户时监护方
                         //MyApplication.getInstance().getAuthDao().initAuth(refreshListRes.monitorList);
-                    }else{
+                    } else {
                         //当前用户为被监护方 将自己的权限写入
                         MyApplication.getInstance().getAuthDao().initAuth(spUtil.getUser().id);
                     }
-                }
-                else {
+                } else {
                     //自动登录
-                   // MyApplication.getInstance().getRelateDao().addList(refreshListRes.monitorList);
+                    // MyApplication.getInstance().getRelateDao().addList(refreshListRes.monitorList);
                     MyApplication.getInstance().getRelateDao().updateState(refreshListRes.monitorList);
                 }
             }
@@ -208,8 +223,6 @@ public class MsgHandle {
         EventBus.getDefault().post(tag);
 
     }
-
-
 
 
 }

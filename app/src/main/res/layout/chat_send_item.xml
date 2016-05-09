@@ -41,7 +41,7 @@
                 android:layout_alignTop="@+id/chat_icon"
                 android:layout_marginBottom="10dp"
                 android:layout_toStartOf="@+id/chat_icon"
-                android:background="@drawable/chat_send_bg2"
+                android:background="@drawable/chat_send_msg"
                 android:clickable="true"
                 android:gravity="center_vertical"
                 android:text="好的"

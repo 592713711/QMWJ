@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<HorizontalScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@android:color/white"
+    android:scrollbars="none">
+
+    <!-- 这里因为父布局是HorizontalScrollView,所以宽度写match_parent不会生效-->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+
+        <com.zhy.android.percent.support.PercentRelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:id="@+id/content_layout">
+
+            <TextView
+                android:id="@+id/alarm_shiduan"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="6dp"
+                android:layout_marginTop="17dp"
+                android:text="上午"
+                android:textColor="#222222"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/alarm_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="7dp"
+                android:layout_marginTop="4dp"
+                android:layout_toEndOf="@+id/alarm_shiduan"
+                android:text="7:30"
+                android:textColor="@android:color/black"
+                android:textSize="30sp"
+                android:textStyle="bold"
+                android:typeface="monospace" />
+
+            <TextView
+                android:id="@+id/alarm_hint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignStart="@+id/alarm_shiduan"
+                android:layout_below="@+id/alarm_shiduan"
+                android:layout_centerVertical="true"
+                android:layout_marginTop="2dp"
+                android:text="起床啦、工作日"
+                android:textColor="#666666"
+                android:layout_marginBottom="7dp"
+                android:textSize="14sp" />
+
+            <com.kyleduo.switchbutton.SwitchButton
+                android:id="@+id/alarm_switch"
+                app:kswTintColor="#21ed3e"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="10dp" />
+
+        </com.zhy.android.percent.support.PercentRelativeLayout>
+
+        <Button
+            android:id="@+id/item_delete"
+            android:layout_width="70dp"
+            android:layout_height="match_parent"
+            android:background="#56254256"
+            android:textColor="#ffffff"
+            android:textSize="16sp"
+            android:text="删除" />
+    </LinearLayout>
+
+</HorizontalScrollView>

@@ -38,4 +38,8 @@ dependencies {
     compile 'com.android.support:design:23.2.1'
     compile project(':libraries:miband-sdk')
     compile files('libs/mpandroidchartlibrary-2-2-4.jar')
+    compile 'info.hoang8f:fbutton:1.0.5'
+    compile files('libs/pinyin4j-2.5.0.jar')
+    compile 'com.kyleduo.switchbutton:library:1.4.0'
+    compile files('libs/Msc.jar')
 }

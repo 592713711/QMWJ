@@ -5,13 +5,11 @@ import android.app.ActivityManager;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 
-import android.content.CursorLoader;
+import android.content.Context;
 import android.content.Intent;
 
-import android.database.Cursor;
 import android.os.Build;
 
-import android.provider.CallLog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -27,22 +25,20 @@ import com.ld.qmwj.R;
 import com.ld.qmwj.dao.AuthDao;
 import com.ld.qmwj.model.Monitor;
 import com.ld.qmwj.model.User;
-import com.ld.qmwj.util.HandlerUtil;
-import com.ld.qmwj.util.PhoneUtils;
+import com.ld.qmwj.model.chatmessage.MapWayMsg;
+import com.ld.qmwj.util.ContactUtil;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
 
 import control.msg.MsgFragment;
 import under_control.home.map.UnderMapFragment;
-import under_control.home.service.FuctionService;
+import under_control.home.service.FunctionService;
 import under_control.home.service.LocationService;
 
 public class HomeActivity_under extends AppCompatActivity {
@@ -59,6 +55,7 @@ public class HomeActivity_under extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home2);
+        EventBus.getDefault().register(this);
         initWindow();
         myApplication=MyApplication.getInstance();
         initView();
@@ -72,6 +69,12 @@ public class HomeActivity_under extends AppCompatActivity {
 
     private void initView() {
         title_text= (TextView) findViewById(R.id.title);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
     }
 
     /**
@@ -125,7 +128,7 @@ public class HomeActivity_under extends AppCompatActivity {
         ArrayList<Monitor> monitors=MyApplication.getInstance().getRelateDao().getList();
         msgFragment = new MsgFragment(monitors.get(0),this);
         phoneFragment=new PhoneFragment(this);
-        mapFragment = new UnderMapFragment(this);
+        mapFragment = new UnderMapFragment(this,this);
         fm = getFragmentManager();
         transaction = fm.beginTransaction();
         transaction.add(R.id.content, msgFragment);
@@ -190,10 +193,10 @@ public class HomeActivity_under extends AppCompatActivity {
         }
 
         // 启动功能服务
-        if(!isServiceRunning("under_control.home.service.FuctionService")){
+        if(!isServiceRunning("under_control.home.service.FunctionService")){
             //若服务未开启  就开启服务
             Log.d(Config.TAG,"服务未开启  执行开启功能服务");
-            Intent intent=new Intent(this,FuctionService.class);
+            Intent intent=new Intent(this,FunctionService.class);
             startService(intent);
         }
 
@@ -216,6 +219,16 @@ public class HomeActivity_under extends AppCompatActivity {
 
 
 
+    /**
+     * 点击路线信息 进入地图显示路线
+     *
+     * @param mapWayMsg
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void showMapWay(MapWayMsg mapWayMsg) {
+        bottomNavigationBar.selectTab(1);
+        mapFragment.showMapWay(mapWayMsg);
+    }
 
     /**
      * 初始化通知栏颜色

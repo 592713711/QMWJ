@@ -17,7 +17,7 @@ public class HandlerUtil {
     public static final int CALLPHONE_RESPONSE = 11;      //收到通话记录响应
     public static final int LINKMAN_REQUEST = 12;      //发送请求联系人
     public static final int LINKMAN_RESPONSE = 13;      //请求联系人响应
-    public static final int CAHT_UPDATE = 14;      //文本聊天请求
+    public static final int CHAT_UPDATE = 14;      //文本聊天请求
     public static final int SMSSTATE = 15;      //短信状态改变
     public static final int SENDSMSSTATE = 16;      //发送短信监控到服务器
     public static final int SMSSTATE_RESPONSE = 17;      //收到短信监控响应
@@ -28,6 +28,8 @@ public class HandlerUtil {
     public static final int UPDATEHEARTDATA=22;     //更新心跳数据
     public static final int DOHEART=23;     //测量心跳数据
     public static final int AUTH_MSG=24;     //测量心跳数据
+    public static final int RECEIVE_BLACKPHONE=25;     //收到黑名单
+    public static final int UPDATE_ALARM=26;        //更新闹钟
 
 
 }

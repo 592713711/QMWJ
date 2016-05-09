@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fbutton="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <android.support.design.widget.TextInputEditText
+            android:id="@+id/contacts_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="姓名"
+            android:inputType="textPersonName" />
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <android.support.design.widget.TextInputEditText
+            android:id="@+id/contacts_num"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="手机号码"
+            android:inputType="number" />
+    </android.support.design.widget.TextInputLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+     >
+
+        <info.hoang8f.widget.FButton
+            android:id="@+id/btn_ok"
+            android:layout_width="80dp"
+            android:layout_height="40dp"
+            fbutton:buttonColor="#e0e0e0"
+            fbutton:shadowEnabled="true"
+            fbutton:shadowHeight="3dp"
+            fbutton:cornerRadius="3dp"
+            android:text="确认"
+            android:layout_marginTop="5dp"
+            android:layout_marginLeft="20dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true"
+            />
+
+        <info.hoang8f.widget.FButton
+            android:id="@+id/btn_cancel"
+            android:layout_width="80dp"
+            android:layout_height="40dp"
+            fbutton:buttonColor="#e0e0e0"
+            fbutton:shadowEnabled="true"
+            fbutton:shadowHeight="3dp"
+            fbutton:cornerRadius="3dp"
+            android:text="取消"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true" />
+    </RelativeLayout>
+
+</LinearLayout>

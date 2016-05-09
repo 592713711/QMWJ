@@ -7,7 +7,7 @@
     <string name="title_activity_home">HomeActivity</string>
     <string name="title_activity_monitor">MonitorActivity</string>
 
-<!-- TODO: Remove or change this placeholder text -->
+    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
     <string name="sunday">日</string>
@@ -26,5 +26,8 @@
     <string name="title_activity_heart_data">HeartDataActivity</string>
     <string name="title_activity_add_location_range">AddLocationRangeActivity</string>
     <string name="title_activity_location_range">LocationRangeActivity</string>
+    <string name="title_activity_blacklist">BlacklistActivity</string>
+    <string name="title_activity_edit">EditActivity</string>
+    <string name="title_activity_alarm">AlarmActivity</string>
 
 </resources>

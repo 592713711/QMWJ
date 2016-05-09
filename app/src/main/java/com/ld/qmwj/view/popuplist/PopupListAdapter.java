@@ -74,6 +74,7 @@ public class PopupListAdapter extends RecyclerView.Adapter<PopupListAdapter.View
         ViewHolder vh = new ViewHolder(v);
         vh.mTextView = (TextView) v.findViewById(R.id.tv_popup);
         //设置view的大小、内边距、外边距、布局参数
+
         //...
         return vh;
     }

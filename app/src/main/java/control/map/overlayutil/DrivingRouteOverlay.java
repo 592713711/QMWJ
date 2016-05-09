@@ -16,6 +16,7 @@ import com.baidu.mapapi.map.PolylineOptions;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.search.route.DrivingRouteLine;
 import com.baidu.mapapi.search.route.DrivingRouteLine.DrivingStep;
+import com.ld.qmwj.Config;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +29,20 @@ public class DrivingRouteOverlay extends OverlayManager {
     private DrivingRouteLine mRouteLine = null;
     boolean focus = false;
     private int lineColor=0;
+    private int pos;
+    private RouteonClickListener routeonClickListener;
+
+    public void setPos(int i){
+        this.pos=i;
+    }
+
+    public int getpos(){
+        return this.pos;
+    }
+
+    public void setRouteonClickListener(RouteonClickListener listener){
+        this.routeonClickListener=listener;
+    }
 
     /**
      * 构造函数
@@ -35,8 +50,9 @@ public class DrivingRouteOverlay extends OverlayManager {
      * @param baiduMap
      *            该DrivingRouteOvelray引用的 BaiduMap
      */
-    public DrivingRouteOverlay(BaiduMap baiduMap) {
+    public DrivingRouteOverlay(BaiduMap baiduMap,int pos) {
         super(baiduMap);
+        this.pos=pos;
     }
 
     @Override
@@ -237,7 +253,7 @@ public class DrivingRouteOverlay extends OverlayManager {
     @Override
     public boolean onPolylineClick(Polyline polyline) {
         boolean flag = false;
-        for (Overlay mPolyline : mOverlayList) {
+        for (Overlay mPolyline:mOverlayList) {
             if(mPolyline instanceof Polyline){
                 //改变路线颜色为未选中状态
                 ((Polyline) mPolyline).setColor(Color.parseColor("#bdbdbd"));
@@ -246,6 +262,8 @@ public class DrivingRouteOverlay extends OverlayManager {
                 //设置路线的层级 注意要比选中路线的层级低
                 ((Polyline) mPolyline).setZIndex(10);
                 if(mPolyline.equals(polyline)){
+                    if(routeonClickListener!=null)
+                    routeonClickListener.onRouteCLick(this.pos);
                     ((Polyline) mPolyline).setFocus(true);
                     //设置选中的路线颜色为高亮状态
                     polyline.setColor(Color.parseColor("#2196f3"));

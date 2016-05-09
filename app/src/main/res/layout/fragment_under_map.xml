@@ -17,6 +17,8 @@
             android:layout_above="@+id/bottom2"></com.baidu.mapapi.map.MapView>
 
 
+
+
         <com.zhy.android.percent.support.PercentRelativeLayout
             android:id="@+id/bottom2"
             android:layout_width="0dp"
@@ -45,6 +47,17 @@
                 app:layout_marginTopPercent="50%" />
 
         </com.zhy.android.percent.support.PercentRelativeLayout>
+
+        <ImageButton
+            android:id="@+id/close_way_btn"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:background="#00000000"
+            android:src="@drawable/close_btn2"
+            app:layout_marginBottomPercent="20%"
+            app:layout_marginRightPercent="5%" />
 
     </com.zhy.android.percent.support.PercentRelativeLayout>
 

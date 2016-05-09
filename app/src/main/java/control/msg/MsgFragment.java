@@ -6,29 +6,32 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.iflytek.cloud.SpeechConstant;
+import com.iflytek.cloud.SpeechError;
+import com.iflytek.cloud.SpeechSynthesizer;
+import com.iflytek.cloud.SynthesizerListener;
 import com.ld.qmwj.Config;
 import com.ld.qmwj.MyApplication;
 import com.ld.qmwj.R;
 import com.ld.qmwj.listener.MyRecycleViewItemListener;
-import com.ld.qmwj.message.Message;
 import com.ld.qmwj.message.request.ChatRequest;
-import com.ld.qmwj.message.request.Request;
 import com.ld.qmwj.model.Monitor;
-import com.ld.qmwj.model.MyLocation;
 import com.ld.qmwj.model.chatmessage.ChatMessage;
+import com.ld.qmwj.model.chatmessage.MapWayMsg;
 import com.ld.qmwj.model.chatmessage.SimpleMsg;
 import com.ld.qmwj.model.chatmessage.SmsMsg;
 import com.ld.qmwj.util.HandlerUtil;
+import com.ld.qmwj.util.VoiceDialog;
 import com.ld.qmwj.view.MyEditText;
 
 import org.greenrobot.eventbus.EventBus;
@@ -56,6 +59,7 @@ public class MsgFragment extends Fragment implements View.OnClickListener, MyRec
     private int currentPage;           // 当前页数
     private int pageSize;              // 每页数据量
     private int currentCount;        //当前数据个数  用于刷新后定位原来的位置
+    private VoiceDialog voiceDialog;
 
     public MsgFragment(Monitor monitor, Context context) {
         this.monitor = monitor;
@@ -126,11 +130,14 @@ public class MsgFragment extends Fragment implements View.OnClickListener, MyRec
         });
 
         ImageButton voiceBtn = (ImageButton) v.findViewById(R.id.input_voice_btn);
-        sendBtn.setOnClickListener(this);
+        //sendBtn.setOnClickListener(this);
         ImageButton addBtn = (ImageButton) v.findViewById(R.id.input_add_btn);
-        sendBtn.setOnClickListener(this);
+        //sendBtn.setOnClickListener(this);
 
-       // recycleViewMsg.scrollToPosition(data.size() - 1);
+        // recycleViewMsg.scrollToPosition(data.size() - 1);
+
+        voiceDialog=new VoiceDialog(context);
+
     }
 
 
@@ -175,7 +182,7 @@ public class MsgFragment extends Fragment implements View.OnClickListener, MyRec
         MyApplication.getInstance().getSendMsgUtil().sendCacheMessageToServer(
                 MyApplication.getInstance().getGson().toJson(chatRequest)
         );
-        EventBus.getDefault().post(HandlerUtil.CAHT_UPDATE);
+        EventBus.getDefault().post(HandlerUtil.CHAT_UPDATE);
         input_edit.setText("");
     }
 
@@ -185,7 +192,10 @@ public class MsgFragment extends Fragment implements View.OnClickListener, MyRec
     private void loadMore() {
         currentCount = data.size();
         //计算recycleview要移动的距离
-        int py = recycleViewMsg.getHeight() - recycleViewMsg.findViewHolderForLayoutPosition(0).itemView.getHeight();
+        int py=0;
+        if (data.size()!=0) {
+           py = recycleViewMsg.getHeight() - recycleViewMsg.findViewHolderForLayoutPosition(0).itemView.getHeight();
+        }
 
 
         currentPage++;
@@ -214,7 +224,7 @@ public class MsgFragment extends Fragment implements View.OnClickListener, MyRec
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void showInfo(Integer tag) {
-        if (tag == HandlerUtil.CAHT_UPDATE || tag == HandlerUtil.CALLPHONE_RESPONSE || tag == HandlerUtil.SMSSTATE_RESPONSE) {
+        if (tag == HandlerUtil.CHAT_UPDATE || tag == HandlerUtil.CALLPHONE_RESPONSE || tag == HandlerUtil.SMSSTATE_RESPONSE) {
             initData();
         }
     }
@@ -230,17 +240,17 @@ public class MsgFragment extends Fragment implements View.OnClickListener, MyRec
     public void onItemClick(View v, int position) {
         ChatMessage chatMessage = data.get(position);
         // Log.d(Config.TAG,"点击了："+chatMessage);
-        if (chatMessage.msg_type == Config.CALL_MSG){
-            Intent intent=new Intent(context, LinkManActivity.class);
-            intent.putExtra("type",Config.CALL_MSG);
-            intent.putExtra("monitor",monitor);
+        if (chatMessage.msg_type == Config.CALL_MSG) {
+            Intent intent = new Intent(context, LinkManActivity.class);
+            intent.putExtra("type", Config.CALL_MSG);
+            intent.putExtra("monitor", monitor);
             startActivity(intent);
-        }else if (chatMessage.msg_type == Config.SMS_MSG) {
-            Intent intent=new Intent(context, SmsContentActivity.class);
-            SmsMsg smsMsg=(SmsMsg)chatMessage;
-            String name=smsMsg.smsName;
-            if(name == null)
-                name=smsMsg.smsNum;
+        } else if (chatMessage.msg_type == Config.SMS_MSG) {
+            Intent intent = new Intent(context, SmsContentActivity.class);
+            SmsMsg smsMsg = (SmsMsg) chatMessage;
+            String name = smsMsg.smsName;
+            if (name == null)
+                name = smsMsg.smsNum;
             Bundle bundle = new Bundle();
             //存入姓名
             bundle.putString("name", name);
@@ -250,8 +260,73 @@ public class MsgFragment extends Fragment implements View.OnClickListener, MyRec
             //传递Bundle
             intent.putExtra("SMS", bundle);
             startActivity(intent);
+        }else if(chatMessage.msg_type==Config.MAPWAY_MSG){
+            //进入地图界面 显示路径信息
+            //通知MonitorActivity显示地图界面
+            MapWayMsg mapWayMsg= (MapWayMsg) chatMessage;
+            EventBus.getDefault().post(mapWayMsg);
+        }else if(chatMessage.msg_type==Config.CHAT_MSG){
+            //文本聊天转化为语音
+            SimpleMsg simpleMsg= (SimpleMsg) chatMessage;
+            doChangeVoice(simpleMsg.msg);
         }
     }
+
+    /**
+     * 将文本信息转化为语音
+     */
+    public void doChangeVoice(String text) {
+
+        //1.创建SpeechSynthesizer对象, 第二个参数：本地合成时传InitListener
+        SpeechSynthesizer mTts = SpeechSynthesizer.createSynthesizer(context, null);
+//2.合成参数设置，详见《科大讯飞MSC API手册(Android)》SpeechSynthesizer 类
+        mTts.setParameter(SpeechConstant.VOICE_NAME, "xiaoyan");//设置发音人
+        mTts.setParameter(SpeechConstant.SPEED, "50");//设置语速
+        mTts.setParameter(SpeechConstant.VOLUME, "80");//设置音量，范围0~100
+        mTts.setParameter(SpeechConstant.ENGINE_TYPE, SpeechConstant.TYPE_CLOUD); //设置云端
+//设置合成音频保存位置（可自定义保存位置），保存在“./sdcard/iflytek.pcm”
+//保存在SD卡需要在AndroidManifest.xml添加写SD卡权限
+//如果不需要保存合成音频，注释该行代码
+      //  mTts.setParameter(SpeechConstant.TTS_AUDIO_PATH, "./sdcard/iflytek.pcm");
+//3.开始合成
+        mTts.startSpeaking(text, mSynListener);
+    }
+
+    private SynthesizerListener mSynListener = new SynthesizerListener() {
+        //会话结束回调接口，没有错误时，error为null
+        public void onCompleted(SpeechError error) {
+            voiceDialog.dismiss();
+            voiceDialog.stopAnim();
+        }
+
+        //缓冲进度回调
+        //percent为缓冲进度0~100，beginPos为缓冲音频在文本中开始位置，endPos表示缓冲音频在文本中结束位置，info为附加信息。
+        public void onBufferProgress(int percent, int beginPos, int endPos, String info) {
+        }
+
+        //开始播放
+        public void onSpeakBegin() {
+            voiceDialog.show(((AppCompatActivity)context).getSupportFragmentManager(), "WAIT_DIALOG");
+            voiceDialog.setCancelable(false);
+        }
+
+        //暂停播放
+        public void onSpeakPaused() {
+        }
+
+        //播放进度回调
+        //percent为播放进度0~100,beginPos为播放音频在文本中开始位置，endPos表示播放音频在文本中结束位置.
+        public void onSpeakProgress(int percent, int beginPos, int endPos) {
+        }
+
+        //恢复播放回调接口
+        public void onSpeakResumed() {
+        }
+
+        //会话事件回调接口
+        public void onEvent(int arg0, int arg1, int arg2, Bundle arg3) {
+        }
+    };
 
     @Override
     public void onDestroy() {

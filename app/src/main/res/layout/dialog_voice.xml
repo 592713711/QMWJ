@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:background="@drawable/dialog_loading_bg"
+    android:gravity="center">
+
+    <View
+        android:layout_width="160.0dip"
+        android:layout_height="160.0dip"
+        android:layout_centerInParent="true" />
+
+    <ImageView
+        android:id="@+id/voice_mic_view"
+        android:layout_width="50dip"
+        android:layout_height="100dip"
+        android:layout_alignParentStart="true"
+        android:layout_marginLeft="30dip"
+        android:layout_marginTop="20dip"
+        android:src="@drawable/voice_mic" />
+
+    <ImageView
+        android:layout_width="50dip"
+        android:layout_height="100dip"
+        android:src="@drawable/voice_5"
+        android:layout_marginLeft="5dip"
+        android:layout_marginTop="15dip"
+        android:id="@+id/voice_size"
+        android:layout_toEndOf="@+id/voice_mic_view"
+
+         />
+
+
+</RelativeLayout>

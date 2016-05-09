@@ -25,12 +25,15 @@ import android.widget.Toast;
 
 import com.ashokvarma.bottomnavigation.BottomNavigationBar;
 import com.ashokvarma.bottomnavigation.BottomNavigationItem;
+import com.iflytek.cloud.SpeechConstant;
+import com.iflytek.cloud.SpeechUtility;
 import com.ld.qmwj.Config;
 import com.ld.qmwj.MyApplication;
 import com.ld.qmwj.R;
 import com.ld.qmwj.client.MsgHandle;
 import com.ld.qmwj.model.Monitor;
 import com.ld.qmwj.model.MyLocation;
+import com.ld.qmwj.model.chatmessage.MapWayMsg;
 import com.ld.qmwj.util.HandlerUtil;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 
@@ -66,6 +69,7 @@ public class MonitorActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_monitor);
+
         monitor = (Monitor) getIntent().getSerializableExtra("monitor");
         initWindow();
         initView();
@@ -73,7 +77,6 @@ public class MonitorActivity extends AppCompatActivity {
         //订阅事件
         EventBus.getDefault().register(this);
     }
-
 
 
     /**
@@ -206,8 +209,8 @@ public class MonitorActivity extends AppCompatActivity {
             hintLayout.setVisibility(View.VISIBLE);
             if (mapFragment != null) {
                 mapFragment.handler.removeMessages(HandlerUtil.REQUEST_ERROR);
-
-                mapFragment.waitDialog.dismiss();
+                if (mapFragment.waitDialog != null)
+                    mapFragment.waitDialog.dismiss();
                 if (isStart)
                     Toast.makeText(this, "对方网络问题，未能获得数据", Toast.LENGTH_SHORT).show();
                 return;
@@ -254,7 +257,6 @@ public class MonitorActivity extends AppCompatActivity {
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void showInfo(Integer tag) {
-        Log.d(Config.TAG, "收到响应" + tag);
         if (tag == HandlerUtil.LOCATION_RESPONSE) {
             //收到位置响应
             MyLocation location = MyApplication.getInstance().getRelateDao().getLocation(monitor.id);
@@ -270,6 +272,17 @@ public class MonitorActivity extends AppCompatActivity {
         } else if (tag == HandlerUtil.CONNECT_SUC || tag == HandlerUtil.CONNECT_FAIL) {
             updateHint();
         }
+    }
+
+    /**
+     * 点击路线信息 进入地图显示路线
+     *
+     * @param mapWayMsg
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void showMapWay(MapWayMsg mapWayMsg) {
+        bottomNavigationBar.selectTab(1);
+        mapFragment.showMapWay(mapWayMsg);
     }
 
     @Override

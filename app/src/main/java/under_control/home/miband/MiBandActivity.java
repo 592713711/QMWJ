@@ -39,7 +39,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import under_control.home.service.FuctionService;
+import under_control.home.service.FunctionService;
 
 /**
  * 手环主界面
@@ -99,7 +99,7 @@ public class MiBandActivity extends AppCompatActivity implements OnClickListener
      * 更新手环状态
      */
     private void updateMiBand() {
-        miBand = FuctionService.miBand;
+        miBand = FunctionService.miBand;
         //判断是否已经绑定
         device = MyApplication.getInstance().getSpUtil().getDevice();
         battery_icon.setVisibility(View.GONE);
@@ -119,12 +119,12 @@ public class MiBandActivity extends AppCompatActivity implements OnClickListener
             contentLayout.setBackgroundResource(R.color.unbindbg);
         } else {
             //判断是否已经连接
-            int isConnect = FuctionService.isConnectBand;
+            int isConnect = FunctionService.isConnectBand;
             if (isConnect == MiBand.CONNECTED) {
                 //手环已连接
                 flag = CONN_FLAG;
-                info = FuctionService.info;
-                FuctionService.getBattery();
+                info = FunctionService.info;
+                FunctionService.getBattery();
                 hintText.setText("");
                 //显示电量
                 if (info != null) {
@@ -184,8 +184,8 @@ public class MiBandActivity extends AppCompatActivity implements OnClickListener
             updateMiBand();
         } else if (flag == CONN_FLAG) {
             //断开连接
-            FuctionService.miBand = new MiBand(MyApplication.getInstance());
-            FuctionService.isConnectBand = MiBand.UNCONNECT;
+            FunctionService.miBand = new MiBand(MyApplication.getInstance());
+            FunctionService.isConnectBand = MiBand.UNCONNECT;
             EventBus.getDefault().post(HandlerUtil.DISCONNECTBAND);
             circleHintView.isAnim=false;
             hintText.isAnim=false;
@@ -217,20 +217,20 @@ public class MiBandActivity extends AppCompatActivity implements OnClickListener
         }
 
 
-        FuctionService.isConnectBand = miBand.CONNECTING;
+        FunctionService.isConnectBand = miBand.CONNECTING;
         miBand.connect(device, new ActionCallback() {
 
             @Override
             public void onSuccess(Object data) {
                 Log.d(Config.TAG, "连接成功!!!");
-                FuctionService.isConnectBand = MiBand.CONNECTED;
+                FunctionService.isConnectBand = MiBand.CONNECTED;
                 getBattery();
                 miBand.setDisconnectedListener(new NotifyListener() {
                     @Override
                     public void onNotify(byte[] data) {
                         Log.d(Config.TAG, "手环连接断开!!!");
                         EventBus.getDefault().post(HandlerUtil.DISCONNECTBAND);
-                        FuctionService.isConnectBand = MiBand.UNCONNECT;
+                        FunctionService.isConnectBand = MiBand.UNCONNECT;
                     }
 
                 });
@@ -251,7 +251,7 @@ public class MiBandActivity extends AppCompatActivity implements OnClickListener
 
             @Override
             public void onFail(int errorCode, String msg) {
-                FuctionService.isConnectBand = MiBand.UNCONNECT;
+                FunctionService.isConnectBand = MiBand.UNCONNECT;
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
@@ -272,7 +272,7 @@ public class MiBandActivity extends AppCompatActivity implements OnClickListener
 
             @Override
             public void onSuccess(final Object data) {
-                FuctionService.info = (BatteryInfo) data;
+                FunctionService.info = (BatteryInfo) data;
                 Log.d(Config.TAG, "电池信息" + info.toString());
                 runOnUiThread(new Runnable() {
                     @Override

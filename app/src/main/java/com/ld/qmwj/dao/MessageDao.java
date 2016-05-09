@@ -161,4 +161,7 @@ public class MessageDao {
 
     }
 
+    public void text(int id) {
+        mDb.delete(TABLE_NAME,COL_MONITOR_ID+"="+id+" and "+COL_TYPE+"="+Config.MAPWAY_MSG,null);
+    }
 }

@@ -29,6 +29,7 @@
             android:src="@drawable/h1"
             app:layout_marginLeftPercent="2%w" />
 
+
         <TextView
             android:id="@+id/chat_content"
             android:layout_width="wrap_content"
@@ -36,7 +37,7 @@
             android:layout_alignTop="@+id/chat_icon"
             android:layout_marginBottom="10dp"
             android:layout_toEndOf="@+id/chat_icon"
-            android:background="@drawable/chat_from_bg"
+            android:background="@drawable/chat_from_msg"
             android:clickable="true"
             android:gravity="center_vertical"
             android:text="Android 线程、组件之间通信可以通过Handler消息处理器，BroadCast广播，Service服务等。   这儿介绍的EventBus是一款针对Android优化的发布/订阅的事件总线"

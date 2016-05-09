@@ -2,10 +2,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-
     android:layout_height="match_parent"
     android:clipToPadding="true"
-
     android:fitsSystemWindows="true"
     tools:context="control.home.HomeActivity">
 
@@ -14,56 +12,35 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="#29b6f6"
-        app:layout_heightPercent="7%"
+        app:layout_heightPercent="17%"
         app:layout_widthPercent="100%">
 
         <TextView
             android:id="@+id/title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
+            android:layout_alignParentBottom="true"
             android:text="监 护 列 表"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="@android:color/white"
-            android:textSize="17sp"
-            app:layout_marginTopPercent="20%" />
+            android:textSize="20sp"
+            app:layout_marginBottomPercent="20%"
+            app:layout_marginLeftPercent="25%" />
 
-
-        <ImageButton
-            android:id="@+id/add_btn"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_centerVertical="true"
-            android:background="#00000000"
-            android:onClick="doAdd"
-            android:src="@drawable/add_btn"
-            app:layout_heightPercent="60%h"
-            app:layout_marginLeftPercent="4%"
-            android:scaleType="fitXY"
-            app:layout_widthPercent="60%h" />
 
         <ImageButton
             android:id="@+id/msg_btn"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="30dp"
+            android:layout_height="25dp"
             android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
+            android:layout_marginRight="15dp"
+            android:layout_marginTop="15dp"
             android:background="#00000000"
             android:onClick="doMsg"
             android:scaleType="fitXY"
             android:src="@drawable/msg_btn"
-            app:layout_heightPercent="60%h"
-            app:layout_marginRightPercent="4%"
-            app:layout_widthPercent="60%h" />
 
-        <com.ld.qmwj.view.BadgeView
-            android:id="@+id/badgeView"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_heightPercent="33%h"
-            app:layout_marginLeftPercent="92%"
-            app:layout_marginTopPercent="10%"
-            app:layout_widthPercent="50%h" />
+            />
 
     </com.zhy.android.percent.support.PercentRelativeLayout>
 
@@ -107,6 +84,22 @@
         android:layout_below="@+id/hint"
         app:layout_heightPercent="90%"
         app:layout_widthPercent="100%" />
+
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/add_btn"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_heightPercent="8%h"
+        app:layout_widthPercent="8%h"
+        app:layout_marginTopPercent="8%"
+        app:layout_marginLeftPercent="3%"
+        android:src="@android:drawable/ic_input_add"
+        app:backgroundTint="#6f85f3"
+        app:borderWidth="0dp"
+        app:elevation="6dp"
+        app:pressedTranslationZ="12dp"
+         />
 
 
 </com.zhy.android.percent.support.PercentRelativeLayout>

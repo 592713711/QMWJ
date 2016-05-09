@@ -185,4 +185,37 @@ public class TimeUtil {
     }
 
 
+    /**
+     * 得到闹钟时段
+     * @param alarm_time
+     * @return
+     */
+    public static String getTimeShidaun(long alarm_time) {
+        SimpleDateFormat format1 = new java.text.SimpleDateFormat("HH");
+        int  hour=Integer.parseInt(format1.format(alarm_time));
+        if(hour>=0&&hour<=4){
+            return "凌晨";
+        }else if(hour>=4&&hour<8)
+            return "早上";
+        else if(hour>=8&&hour<11)
+            return "上午";
+        else if(hour>=11&&hour<13)
+            return "中午";
+        else if(hour>=13&&hour<17)
+            return "下午";
+        else if(hour>=17&&hour<=24)
+            return "晚上";
+
+        return "未知";
+    }
+
+    public static int getHour(long alarm_time) {
+        SimpleDateFormat format1 = new java.text.SimpleDateFormat("HH");
+        return Integer.parseInt(format1.format(alarm_time));
+    }
+
+    public static int getMinute(long alarm_time) {
+        SimpleDateFormat format1 = new java.text.SimpleDateFormat("mm");
+        return Integer.parseInt(format1.format(alarm_time));
+    }
 }

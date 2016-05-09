@@ -13,7 +13,6 @@ import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
@@ -31,8 +30,7 @@ import com.zhaoxiaodan.miband.listeners.HeartRateNotifyListener;
 
 import java.util.ArrayList;
 
-import control.home.RcAdapter;
-import under_control.home.service.FuctionService;
+import under_control.home.service.FunctionService;
 
 public class HeartActivity extends AppCompatActivity implements View.OnClickListener, HeartView.StopRingAnim, MyRecycleViewItemListener {
 
@@ -83,7 +81,7 @@ public class HeartActivity extends AppCompatActivity implements View.OnClickList
 
                 if (isChecked) {
                     Log.d(Config.TAG, "选中");
-                    if (FuctionService.isConnectBand != MiBand.CONNECTED) {
+                    if (FunctionService.isConnectBand != MiBand.CONNECTED) {
                         Toast.makeText(HeartActivity.this, "手环未连接", Toast.LENGTH_SHORT).show();
                         heart_btn.setChecked(false);
                         return;
@@ -131,7 +129,7 @@ public class HeartActivity extends AppCompatActivity implements View.OnClickList
     }
 
     public void updateMiBand() {
-        miBand = FuctionService.miBand;
+        miBand = FunctionService.miBand;
     }
 
     /**

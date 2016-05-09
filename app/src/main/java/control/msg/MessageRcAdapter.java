@@ -16,7 +16,9 @@ import com.google.gson.Gson;
 import com.ld.qmwj.Config;
 import com.ld.qmwj.R;
 import com.ld.qmwj.listener.MyRecycleViewItemListener;
+import com.ld.qmwj.model.RouteWay;
 import com.ld.qmwj.model.chatmessage.ChatMessage;
+import com.ld.qmwj.model.chatmessage.MapWayMsg;
 import com.ld.qmwj.model.chatmessage.PhoneStateMsg;
 import com.ld.qmwj.model.chatmessage.SimpleMsg;
 import com.ld.qmwj.model.chatmessage.SmsMsg;
@@ -36,6 +38,8 @@ public class MessageRcAdapter extends RecyclerView.Adapter {
     public static final int CHAT_FROM_TYPE = 0;
     public static final int CHAT_SEND_TYPE = 1;
     public static final int HINT_FROM_TYPE = 2;
+    public static final int MAPWAY_SEND_TYPE = 3;
+    public static final int MAPWAY_FROM_TYPE = 4;
 
     public MessageRcAdapter(Context context) {
         this.context = context;
@@ -61,15 +65,23 @@ public class MessageRcAdapter extends RecyclerView.Adapter {
         switch (viewType) {
             case CHAT_FROM_TYPE:
                 v = inflater.inflate(R.layout.chat_from_item, null);
-                holder = new ChatFromHolder(v);
+                holder = new ChatFromHolder(v, myRcClickListener);
                 break;
             case CHAT_SEND_TYPE:
                 v = inflater.inflate(R.layout.chat_send_item, null);
-                holder = new ChatSendHolder(v);
+                holder = new ChatSendHolder(v, myRcClickListener);
                 break;
             case HINT_FROM_TYPE:
                 v = inflater.inflate(R.layout.hint_from_item, null);
-                holder = new HintFromHolder(v,myRcClickListener);
+                holder = new HintFromHolder(v, myRcClickListener);
+                break;
+            case MAPWAY_SEND_TYPE:
+                v = inflater.inflate(R.layout.mapway_send_item, null);
+                holder = new MapWaySendHolder(v, myRcClickListener);
+                break;
+            case MAPWAY_FROM_TYPE:
+                v = inflater.inflate(R.layout.mapway_from_item, null);
+                holder = new MapWaySendHolder(v, myRcClickListener);
                 break;
 
         }
@@ -155,6 +167,21 @@ public class MessageRcAdapter extends RecyclerView.Adapter {
 
             }
         }
+
+        if (holder instanceof MapWaySendHolder) {
+            MapWaySendHolder mapHolder = (MapWaySendHolder) holder;
+            MapWayMsg mapWayMsg = (MapWayMsg) cm;
+            RouteWay routeWay = mapWayMsg.routeWay;
+            String routetype = "";
+            if (routeWay.way_type == Config.ROUTE_WALK)
+                routetype = "步行";
+            if (routeWay.way_type == Config.ROUTE_DRIVE)
+                routetype = "驾车";
+            if (routeWay.way_type == Config.ROUTE_BUS)
+                routetype = "换乘";
+            mapHolder.hintText1.setText(routetype + "路径消息");
+            mapHolder.hintText2.setText(routeWay.endAddress);
+        }
     }
 
     @Override
@@ -167,11 +194,15 @@ public class MessageRcAdapter extends RecyclerView.Adapter {
                 case Config.CALL_MSG:
                 case Config.SMS_MSG:
                     return HINT_FROM_TYPE;
+                case Config.MAPWAY_MSG:
+                    return MAPWAY_FROM_TYPE;
             }
 
         } else {
             if (cm.msg_type == Config.CHAT_MSG) {
                 return CHAT_SEND_TYPE;
+            } else if (cm.msg_type == Config.MAPWAY_MSG) {
+                return MAPWAY_SEND_TYPE;
             }
         }
 
@@ -184,58 +215,82 @@ public class MessageRcAdapter extends RecyclerView.Adapter {
         return data.size();
     }
 
-    class MyViewHolder extends RecyclerView.ViewHolder {
+    class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public TextView time;
         public ImageView headView;
+        public MyRecycleViewItemListener onClickListener;
 
-        public MyViewHolder(View itemView) {
+
+        public MyViewHolder(View itemView, MyRecycleViewItemListener onClickListener) {
             super(itemView);
+            this.onClickListener=onClickListener;
             time = (TextView) itemView.findViewById(R.id.chat_createDate);
             headView = (ImageView) itemView.findViewById(R.id.chat_icon);
+
+            (itemView.findViewById(R.id.chat_content)).setOnClickListener(this);
+
+        }
+
+        @Override
+        public void onClick(View v) {
+            if (onClickListener != null)
+                onClickListener.onItemClick(v, getAdapterPosition());
         }
     }
 
     class ChatFromHolder extends MyViewHolder {
         public TextView msgText;
 
-        public ChatFromHolder(View itemView) {
-            super(itemView);
+        public ChatFromHolder(View itemView, MyRecycleViewItemListener onClickListener) {
+            super(itemView, onClickListener);
             msgText = (TextView) itemView.findViewById(R.id.chat_content);
+
         }
     }
 
     class ChatSendHolder extends MyViewHolder {
         public TextView msgText;
 
-        public ChatSendHolder(View itemView) {
-            super(itemView);
+        public ChatSendHolder(View itemView, MyRecycleViewItemListener onClickListener) {
+            super(itemView, onClickListener);
             msgText = (TextView) itemView.findViewById(R.id.chat_content);
+
         }
+
+
     }
 
-    class HintFromHolder extends MyViewHolder implements View.OnClickListener{
+    class HintFromHolder extends MyViewHolder implements View.OnClickListener {
         ImageView iconImage;
         TextView hintText1;
         TextView hintText2;
-        RelativeLayout layout;
-        MyRecycleViewItemListener onClickListener;
-        public HintFromHolder(View itemView,MyRecycleViewItemListener onClickListener) {
-            super(itemView);
-            this.onClickListener=onClickListener;
+
+        public HintFromHolder(View itemView, MyRecycleViewItemListener onClickListener) {
+            super(itemView, onClickListener);
 
             iconImage = (ImageView) itemView.findViewById(R.id.hint_icon);
             hintText1 = (TextView) itemView.findViewById(R.id.hintmsg1);
             hintText2 = (TextView) itemView.findViewById(R.id.hintmsg2);
-            layout= (RelativeLayout) itemView.findViewById(R.id.chat_content);
-            layout.setOnClickListener(this);
+
         }
 
-        @Override
-        public void onClick(View v) {
-            if(onClickListener!=null)
-                onClickListener.onItemClick(v,getAdapterPosition());
-        }
     }
 
+
+    class MapWaySendHolder extends MyViewHolder implements View.OnClickListener {
+        TextView hintText1;
+        TextView hintText2;
+        RelativeLayout layout;
+        MyRecycleViewItemListener onClickListener;
+
+        public MapWaySendHolder(View itemView, MyRecycleViewItemListener onClickListener) {
+            super(itemView, onClickListener);
+
+            hintText1 = (TextView) itemView.findViewById(R.id.hintmsg1);
+            hintText2 = (TextView) itemView.findViewById(R.id.hintmsg2);
+
+        }
+
+    }
 
 }

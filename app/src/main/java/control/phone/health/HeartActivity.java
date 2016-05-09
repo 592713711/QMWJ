@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -32,8 +31,6 @@ import com.ld.qmwj.model.Monitor;
 import com.ld.qmwj.util.HandlerUtil;
 import com.ld.qmwj.view.HeartView;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
-import com.zhaoxiaodan.miband.MiBand;
-import com.zhaoxiaodan.miband.listeners.HeartRateNotifyListener;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -41,9 +38,7 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 
-import under_control.home.miband.HeartDataActivity;
 import under_control.home.miband.HeartRcAdapter;
-import under_control.home.service.FuctionService;
 
 public class HeartActivity extends AppCompatActivity implements HeartView.StopRingAnim, MyRecycleViewItemListener {
 

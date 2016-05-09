@@ -57,9 +57,9 @@ public class HomeActivity extends AppCompatActivity {
     private void initView() {
 
         //初始化BadgeView
-        mBadgeView = (BadgeView) findViewById(R.id.badgeView);
-        mBadgeView.setVisibility(View.VISIBLE);
-        mBadgeView.setBadgeCount(5);
+       // mBadgeView = (BadgeView) findViewById(R.id.badgeView);
+      //  mBadgeView.setVisibility(View.VISIBLE);
+      //  mBadgeView.setBadgeCount(5);
 
         //初始化recycleView
         recyclerView = (RecyclerView) findViewById(R.id.recycleview_list);

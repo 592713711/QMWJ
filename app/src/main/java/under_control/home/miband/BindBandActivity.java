@@ -1,9 +1,7 @@
 package under_control.home.miband;
 
 import android.annotation.TargetApi;
-import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothClass;
 import android.bluetooth.BluetoothDevice;
 import android.os.Build;
 import android.os.Handler;
@@ -11,15 +9,12 @@ import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 import com.ld.qmwj.Config;
@@ -38,7 +33,7 @@ import org.greenrobot.eventbus.EventBus;
 
 import java.util.HashMap;
 
-import under_control.home.service.FuctionService;
+import under_control.home.service.FunctionService;
 
 /**
  * 扫秒蓝牙设备  绑定手环活动
@@ -66,7 +61,7 @@ public class BindBandActivity extends AppCompatActivity implements AdapterView.O
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bind_band);
-        miBand = FuctionService.miBand;
+        miBand = FunctionService.miBand;
         initWindow();
         initView();
 

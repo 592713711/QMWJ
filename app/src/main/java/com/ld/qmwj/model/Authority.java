@@ -12,4 +12,5 @@ public class Authority {
 	public String loation_range3;
 	public int sms_auth;
 	public int call_auth;
+	//public int linkman_auth;
 }

@@ -11,7 +11,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String DBNAME = "qmwj.db";
 
     public DBHelper(Context context) {
-        super(context, DBNAME, null, 11);
+        super(context, DBNAME, null, 19);
     }
 
     @Override
@@ -24,14 +24,16 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL(LinkManDao.SQL_CREATE_TABLE);
         db.execSQL(SmsDao.SQL_CREATE_TABLE);
         db.execSQL(HeartDao.SQL_CREATE_TABLE);
+        db.execSQL(BlacklistDao.SQL_CREATE_TABLE);
+        db.execSQL(AlarmDao.SQL_CREATE_TABLE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         //db.execSQL(SmsDao.SQL_DROP_TABLE);
         //db.execSQL(RelateDao.SQL_DROP_TABLE);
-        //db.execSQL(HeartDao.SQL_DROP_TABLE);
-       db.execSQL(AuthDao.SQL_DROP_TABLE);
+       // db.execSQL(HeartDao.SQL_DROP_TABLE);
+        db.execSQL(AlarmDao.SQL_DROP_TABLE);
         onCreate(db);
     }
 }

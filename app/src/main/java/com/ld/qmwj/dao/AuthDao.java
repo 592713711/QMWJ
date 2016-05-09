@@ -32,9 +32,10 @@ public class AuthDao {
     public static final String COL_CLOCK_AUTH = "clock_auth";          //闹钟
     public static final String COL_SOUND_AUTH = "sound_auth";          //声音
     public static final String COL_CLOSE_AUTH = "close_auth";          //关机
+    public static final String COL_LINKMAN_AUTH = "Linkman_auth";          //联系人
 
     public static final String SQL_CREATE_TABLE = String.format(
-            "CREATE table IF NOT EXISTS %s(%s integer,%s integer,%s text,%s text,%s text,%s integer,%s integer,%s integer,%s integer,%s integer,%s integer,%s integer)",
+            "CREATE table IF NOT EXISTS %s(%s integer,%s integer,%s text,%s text,%s text,%s integer,%s integer,%s integer,%s integer,%s integer,%s integer,%s integer,%s integer)",
             TABLE_NAME,
             COL_MONITOR_ID,
             COL_LOCATION_AUTH,
@@ -47,7 +48,8 @@ public class AuthDao {
             COL_HEALTH_AUTH,
             COL_CLOCK_AUTH,
             COL_SOUND_AUTH,
-            COL_CLOSE_AUTH
+            COL_CLOSE_AUTH,
+            COL_LINKMAN_AUTH
     );
 
     //删除表语句

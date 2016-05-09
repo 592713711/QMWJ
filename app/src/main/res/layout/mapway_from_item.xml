@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#00000000">
+
+        <com.zhy.android.percent.support.PercentRelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true">
+
+            <TextView
+                android:id="@+id/chat_createDate"
+                style="@style/chat_date_style"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/roundshape"
+                android:text="03-25 23:02" />
+
+            <com.ld.qmwj.view.CircleImageView
+                android:id="@+id/chat_icon"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/chat_createDate"
+                android:layout_marginTop="10dp"
+                android:src="@drawable/h1"
+                app:layout_marginLeftPercent="2%w" />
+
+
+
+            <com.zhy.android.percent.support.PercentRelativeLayout
+                android:id="@+id/chat_content"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/chat_icon"
+                android:layout_toEndOf="@+id/chat_icon"
+                android:background="@drawable/chat_from_msg"
+                app:layout_marginRightPercent="10%w"
+                android:layout_marginBottom="15dp">
+
+                <ImageView
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/mapway_icon"
+                    android:background="#00000000"
+                    android:id="@+id/hint_icon"
+                    android:layout_alignParentStart="true"
+                    />
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="收到阿瓜的一条短信"
+                    android:id="@+id/hintmsg1"
+                    android:ellipsize="end"
+                    android:singleLine="true"
+                    android:layout_alignTop="@+id/hint_icon"
+                    android:layout_toEndOf="@+id/hint_icon"
+                    android:layout_marginLeft="10dp"
+                    />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="15700721568"
+                    android:id="@+id/hintmsg2"
+                    android:singleLine="true"
+                    android:ellipsize="end"
+                    android:textColor="#000000"
+                    android:textSize="15sp"
+                    android:maxEms="10"
+                    android:layout_below="@+id/hintmsg1"
+                    android:layout_alignStart="@+id/hintmsg1"
+                    />
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="(点击查看)"
+                    android:textSize="12sp"
+                    android:layout_marginTop="10dp"
+                    android:layout_alignBottom="@+id/hint_icon"
+                    android:layout_toEndOf="@+id/hint_icon"
+                    android:layout_alignStart="@+id/hintmsg1"
+                    />
+
+            </com.zhy.android.percent.support.PercentRelativeLayout>
+
+        </com.zhy.android.percent.support.PercentRelativeLayout>
+
+    </RelativeLayout>
+</RelativeLayout>

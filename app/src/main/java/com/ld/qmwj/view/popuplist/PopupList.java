@@ -14,7 +14,6 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.PopupWindow;
 
 import com.ld.qmwj.R;
@@ -52,7 +51,7 @@ public class PopupList implements View.OnTouchListener {
         return instance;
     }
 
-    private PopupList() {
+    public PopupList() {
 
     }
 
@@ -116,7 +115,7 @@ public class PopupList implements View.OnTouchListener {
             }
         } else if (rightEdgeOffset < PopupWindowWidth / 2) {
             if (rightEdgeOffset < ScreenUtils.dp2px(arrowWidth / 2.0f)) {
-                iv.setTranslationX(PopupWindowWidth - rightEdgeOffset - ScreenUtils.dp2px(arrowWidth / 2.0f)-ScreenUtils.dp2px(windowCornersRadius));
+                iv.setTranslationX(PopupWindowWidth - rightEdgeOffset - ScreenUtils.dp2px(arrowWidth / 2.0f) - ScreenUtils.dp2px(windowCornersRadius));
             } else {
                 iv.setTranslationX(PopupWindowWidth - rightEdgeOffset - ScreenUtils.dp2px(arrowWidth / 2.0f));
             }
@@ -158,7 +157,7 @@ public class PopupList implements View.OnTouchListener {
      * 给ListView绑定长按弹出(在手指按下的位置)横向气泡式菜单
      *
      * @param context                  上下文，一般为Activity
-     * @param absListView                 要弹出菜单的ListView或GridView等
+     * @param absListView              要弹出菜单的ListView或GridView等
      * @param popupMenuItemList        要弹出的菜单项列表
      * @param popupListOnClickListener 弹出菜单的点击监听接口
      */
@@ -176,6 +175,7 @@ public class PopupList implements View.OnTouchListener {
         });
         setOnPopupListClickListener(popupListOnClickListener);
     }
+
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {

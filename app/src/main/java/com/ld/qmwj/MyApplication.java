@@ -5,8 +5,12 @@ import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.google.gson.Gson;
+import com.iflytek.cloud.SpeechConstant;
+import com.iflytek.cloud.SpeechUtility;
 import com.ld.qmwj.client.ClientService;
+import com.ld.qmwj.dao.AlarmDao;
 import com.ld.qmwj.dao.AuthDao;
+import com.ld.qmwj.dao.BlacklistDao;
 import com.ld.qmwj.dao.CacheDao;
 import com.ld.qmwj.dao.CallPhoneDao;
 import com.ld.qmwj.dao.HeartDao;
@@ -39,6 +43,8 @@ public class MyApplication extends Application {
     private MessageDao messageDao;
     private SmsDao smsDao;
     private HeartDao heartDao;
+    private BlacklistDao blacklistDao;
+    private AlarmDao alarmDao;
 
     public static final String SP_FILE_NAME = "user_sp";
 
@@ -50,6 +56,8 @@ public class MyApplication extends Application {
     public void onCreate() {
         super.onCreate();
         //比活动创建时启动服务要先执行
+        // 注册科大讯飞服务
+        SpeechUtility.createUtility(this, SpeechConstant.APPID + "=572efe27");
         startService(new Intent(this, ClientService.class));
         mApplication = this;
     }
@@ -140,6 +148,18 @@ public class MyApplication extends Application {
         if (heartDao == null)
             heartDao = new HeartDao(this);
         return heartDao;
+    }
+
+    public synchronized BlacklistDao getBlacklistDao() {
+        if (blacklistDao == null)
+            blacklistDao = new BlacklistDao(this);
+        return blacklistDao;
+    }
+
+    public synchronized AlarmDao getAlarmtDao() {
+        if (alarmDao == null)
+            alarmDao = new AlarmDao(this);
+        return alarmDao;
     }
 
 

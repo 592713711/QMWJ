@@ -5,14 +5,11 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.Point;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.os.Handler;
-import android.os.HandlerThread;
 import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,7 +17,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -51,7 +47,6 @@ import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.map.PolygonOptions;
 import com.baidu.mapapi.model.LatLng;
-import com.baidu.mapapi.model.inner.GeoPoint;
 import com.baidu.mapapi.search.core.SearchResult;
 import com.baidu.mapapi.search.geocode.GeoCodeOption;
 import com.baidu.mapapi.search.geocode.GeoCodeResult;
@@ -73,12 +68,17 @@ import com.ld.qmwj.Config;
 import com.ld.qmwj.MyApplication;
 import com.ld.qmwj.R;
 import com.ld.qmwj.client.MsgHandle;
+import com.ld.qmwj.message.request.RouteWayRequest;
 import com.ld.qmwj.model.LocationRange;
 import com.ld.qmwj.model.Monitor;
 import com.ld.qmwj.model.MyLocation;
+import com.ld.qmwj.model.RouteWay;
+import com.ld.qmwj.model.chatmessage.MapWayMsg;
 import com.ld.qmwj.util.HandlerUtil;
 import com.ld.qmwj.util.TimeUtil;
 import com.ld.qmwj.util.WaitDialog;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -87,6 +87,7 @@ import control.home.MonitorActivity;
 import control.map.LiShiLuxian.RouteActivity;
 import control.map.locationRange.AddLocationRangeActivity;
 import control.map.overlayutil.DrivingRouteOverlay;
+import control.map.overlayutil.RouteonClickListener;
 import control.map.overlayutil.TransitRouteOverlay;
 import control.map.overlayutil.WalkingRouteOverlay;
 import under_control.home.map.MyOrientationListener;
@@ -100,6 +101,7 @@ public class MapFragment extends Fragment implements View.OnClickListener {
     private MonitorActivity monitorActivity;
     private MapView mMapView = null;
     private BaiduMap mBaidumap;
+    private View viewGroup;     //布局view
 
     private LocationClient mLocationClient;
     private MyLocationListener myLocationListener;
@@ -115,8 +117,10 @@ public class MapFragment extends Fragment implements View.OnClickListener {
     private MyLocationConfiguration.LocationMode mLocationModel;         //定位模式
 
     private String city = "广德";       //对方当前位置的城市
-    int way_type = 0;         //路线类型  0步行 1小车 2公交
-    LatLng selectLatLng = null;       //选择的坐标点
+    private int way_type = 0;         //路线类型  0步行 1小车 2公交
+    private LatLng selectLatLng = null;       //选择的坐标点
+    private String selectAddress = "";
+    private int selectRoutePos = 0;
     private boolean isSelect = false;     //判断是否是点击地图的标志
 
 
@@ -157,7 +161,7 @@ public class MapFragment extends Fragment implements View.OnClickListener {
                 if (waitDialog != null) {
                     waitDialog.dismiss();
                 }
-                Toast.makeText(MyApplication.getInstance(), "查找路线，请检查网络", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MyApplication.getInstance(), "查找路线失败，请检查网络", Toast.LENGTH_SHORT).show();
             } else if (msg.what == HandlerUtil.REQUEST_ERROR) {
                 if (waitDialog != null) {
                     waitDialog.dismiss();
@@ -193,11 +197,11 @@ public class MapFragment extends Fragment implements View.OnClickListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_map, container, false);
-        initView(view);
+        viewGroup = inflater.inflate(R.layout.fragment_map, container, false);
+        initView(viewGroup);
         initAnim();
         centerToMyPosition();
-        return view;
+        return viewGroup;
     }
 
     private void initData() {
@@ -292,10 +296,12 @@ public class MapFragment extends Fragment implements View.OnClickListener {
                         break;
                 }
                 //判断是点击地图还是到当前位置
-                if (isSelect)
-                    searchWay(selectLatLng);
-                else
-                    searchWay(currentLocation);
+                if (selectLatLng != null) {
+                    if (isSelect)
+                        searchWay(selectLatLng);
+                    else
+                        searchWay(currentLocation);
+                }
             }
         });
 
@@ -366,7 +372,9 @@ public class MapFragment extends Fragment implements View.OnClickListener {
                         location_message.setText(msg);
                         return;
                     }
-                    location_message.setText("标记位置：" + result.getAddress());
+                    location_message.setText("标记位置:" + result.getAddress());
+                    ReverseGeoCodeResult.AddressComponent component = result.getAddressDetail();
+                    selectAddress = component.city + component.district + component.street + component.streetNumber;
 
                 }
 
@@ -526,7 +534,7 @@ public class MapFragment extends Fragment implements View.OnClickListener {
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
         //第一次显示时请求位置
-        if (!hidden && isFirst) {
+        if (!hidden && isFirst && !isMapWay) {
             //请求位置
             requestPosition();
             isFirst = false;
@@ -596,6 +604,19 @@ public class MapFragment extends Fragment implements View.OnClickListener {
         isSelect = false;
         mBaidumap.setOnMapClickListener(null);
         mBaidumap.clear();
+        if (isMapWay) {
+            isMapWay = false;
+            ImageButton search_btn = (ImageButton) viewGroup.findViewById(R.id.search_btn);
+            search_btn.setVisibility(View.VISIBLE);
+            more_btn.setVisibility(View.VISIBLE);
+            viewGroup.findViewById(R.id.walk_radio).setEnabled(true);
+            viewGroup.findViewById(R.id.bus_radio).setEnabled(true);
+            viewGroup.findViewById(R.id.car_radio).setEnabled(true);
+            radioGroup.setEnabled(true);
+
+
+        }
+        selectLatLng = null;
         centerToMyPosition();
 
     }
@@ -718,7 +739,11 @@ public class MapFragment extends Fragment implements View.OnClickListener {
                 WalkingRouteResult walkingRouteResult) {
             mBaidumap.clear();
             handler.removeMessages(HandlerUtil.SEAECH_ERROR);
-            waitDialog.dismiss();
+
+            if (waitDialog != null)
+                waitDialog.dismiss();
+
+
             if (walkingRouteResult == null
                     || walkingRouteResult.error != SearchResult.ERRORNO.NO_ERROR) {
                 Toast.makeText(monitorActivity, "抱歉，未找到结果",
@@ -729,6 +754,9 @@ public class MapFragment extends Fragment implements View.OnClickListener {
                 return;
             }
             if (walkingRouteResult.error == SearchResult.ERRORNO.NO_ERROR) {
+                if (isSelect && !isMapWay)
+                    showSelectDialog();
+
                 WalkingRouteOverlay walkingRouteOverlay = new WalkingRouteOverlay(
                         mBaidumap);
                 walkingRouteOverlay.setData(walkingRouteResult.getRouteLines()
@@ -737,7 +765,8 @@ public class MapFragment extends Fragment implements View.OnClickListener {
                 walkingRouteOverlay.addToMap();
                 walkingRouteOverlay.zoomToSpan();
                 int totalLine = walkingRouteResult.getRouteLines().size();
-                //Toast.makeText(MainActivity.this, "共查询出" + totalLine + "条符合条件的线路", Toast.LENGTH_SHORT).show();
+                if (!isMapWay)
+                    Toast.makeText(monitorActivity, "共查询出" + totalLine + "条符合条件的线路", Toast.LENGTH_SHORT).show();
 
             }
         }
@@ -752,6 +781,7 @@ public class MapFragment extends Fragment implements View.OnClickListener {
             handler.removeMessages(HandlerUtil.SEAECH_ERROR);
             if (waitDialog != null)
                 waitDialog.dismiss();
+
             if (transitRouteResult == null
                     || transitRouteResult.error != SearchResult.ERRORNO.NO_ERROR) {
                 Toast.makeText(monitorActivity, "抱歉，未找到结果",
@@ -763,23 +793,52 @@ public class MapFragment extends Fragment implements View.OnClickListener {
                 return;
             }
             if (transitRouteResult.error == SearchResult.ERRORNO.NO_ERROR) {
-                TransitRouteOverlay transitRouteOverlay = new TransitRouteOverlay(
-                        mBaidumap);
-                transitRouteOverlay.setData(transitRouteResult.getRouteLines()
-                        .get(0));// 设置一条驾车路线方案
-                mBaidumap.setOnMarkerClickListener(transitRouteOverlay);
-                transitRouteOverlay.addToMap();
-                transitRouteOverlay.zoomToSpan();
+                if (isSelect && !isMapWay)
+                    showSelectDialog();
+                if (isMapWay) {
+                    TransitRouteOverlay transitRouteOverlay = new TransitRouteOverlay(
+                            mBaidumap, routeWayTemp.routePos, MapFragment.this);
+                    transitRouteOverlay.setData(transitRouteResult.getRouteLines()
+                            .get(routeWayTemp.routePos));// 设置一条驾车路线方案
+                    transitRouteOverlay.addToMap();
+                    transitRouteOverlay.zoomToSpan();
+                    return;
+                }
+
+                selectRoutePos = 0;
                 int totalLine = transitRouteResult.getRouteLines().size();
-                Toast.makeText(monitorActivity,
-                        "共查询出" + totalLine + "条符合条件的线路", Toast.LENGTH_SHORT).show();
+                for (int i = totalLine - 1; i >= 0; i--) {
+                    TransitRouteOverlay transitRouteOverlay = new TransitRouteOverlay(
+                            mBaidumap, i, MapFragment.this);
+                    transitRouteOverlay.setRouteonClickListener(routeonClickListener);
+                    transitRouteOverlay.setTransitRouteResult(transitRouteResult);
+                    if (i != 0) {
+                        transitRouteOverlay.setLineColor(Color.parseColor("#bdbdbd"));
+                    } else {
+                        //将初始选中路线设置为第一条
+                        transitRouteOverlay.setLineColor(Color.parseColor("#2196f3"));
+                    }
+                    transitRouteOverlay.setData(transitRouteResult.getRouteLines()
+                            .get(i));// 设置一条驾车路线方案
+
+                    transitRouteOverlay.addToMap();
+                    transitRouteOverlay.zoomToSpan();
+                    //设置路线点击监听器
+                    mBaidumap.setOnPolylineClickListener(transitRouteOverlay);
+                    //设置点击路标监听器
+                    mBaidumap.setOnMarkerClickListener(transitRouteOverlay);
+                }
+
+                if (!isMapWay)
+                    Toast.makeText(monitorActivity,
+                            "共查询出" + totalLine + "条符合条件的线路", Toast.LENGTH_SHORT).show();
 
                 // 通过getTaxiInfo()可以得到很多关于打车的信息
-                Toast.makeText(
+               /* Toast.makeText(
                         monitorActivity,
                         "该路线打车总路程"
                                 + transitRouteResult.getTaxiInfo()
-                                .getDistance(), Toast.LENGTH_SHORT).show();
+                                .getDistance(), Toast.LENGTH_SHORT).show();*/
             }
 
         }
@@ -792,9 +851,8 @@ public class MapFragment extends Fragment implements View.OnClickListener {
                 DrivingRouteResult drivingRouteResult) {
             mBaidumap.clear();
             handler.removeMessages(HandlerUtil.SEAECH_ERROR);
-            waitDialog.dismiss();
-            if (isSelect)
-                showSelectDialog();
+            if (waitDialog != null)
+                waitDialog.dismiss();
             if (drivingRouteResult == null
                     || drivingRouteResult.error != SearchResult.ERRORNO.NO_ERROR) {
                 Toast.makeText(monitorActivity, "抱歉，未找到结果",
@@ -806,13 +864,30 @@ public class MapFragment extends Fragment implements View.OnClickListener {
                 return;
             }
             if (drivingRouteResult.error == SearchResult.ERRORNO.NO_ERROR) {
+                if (isSelect && !isMapWay)
+                    showSelectDialog();
+                if (isMapWay) {
+                    DrivingRouteOverlay drivingRouteOverlay = new DrivingRouteOverlay(
+                            mBaidumap, routeWayTemp.routePos);
+                    drivingRouteOverlay.setRouteonClickListener(routeonClickListener);
+
+                    drivingRouteOverlay.setData(drivingRouteResult.getRouteLines()
+                            .get(routeWayTemp.routePos));// 设置一条驾车路线方案
+
+                    drivingRouteOverlay.addToMap();
+                    drivingRouteOverlay.zoomToSpan();
+                    return;
+                }
+                selectRoutePos = 0;
                 int totalLine = drivingRouteResult.getRouteLines().size();
                 for (int i = totalLine - 1; i >= 0; i--) {
                     DrivingRouteOverlay drivingRouteOverlay = new DrivingRouteOverlay(
-                            mBaidumap);
+                            mBaidumap, i);
+                    drivingRouteOverlay.setRouteonClickListener(routeonClickListener);
                     if (i != 0) {
                         drivingRouteOverlay.setLineColor(Color.parseColor("#bdbdbd"));
                     } else {
+                        //将初始选中路线设置为第一条
                         drivingRouteOverlay.setLineColor(Color.parseColor("#2196f3"));
                     }
                     drivingRouteOverlay.setData(drivingRouteResult.getRouteLines()
@@ -826,35 +901,140 @@ public class MapFragment extends Fragment implements View.OnClickListener {
                     mBaidumap.setOnMarkerClickListener(drivingRouteOverlay);
                 }
 
+                if (!isMapWay)
+                    Toast.makeText(monitorActivity,
+                            "共查询出" + totalLine + "条符合条件的线路", Toast.LENGTH_SHORT).show();
 
-                Toast.makeText(monitorActivity,
-                        "共查询出" + totalLine + "条符合条件的线路", Toast.LENGTH_SHORT).show();
-
-                // 通过getTaxiInfo()可以得到很多关于打车的信息
-
-                //   Toast.makeText(MainActivity.this, "该路线打车总路程" + drivingRouteResult.getTaxiInfo()
-                //                   .getDistance(), Toast.LENGTH_SHORT).show();
             }
 
         }
     };
 
+    /**
+     * 弹出发送路线框
+     */
     public void showSelectDialog() {
-        GeoPoint gp = new GeoPoint(selectLatLng.latitudeE6, selectLatLng.longitudeE6);
         InfoWindow mInfoWindow;
-        //将地图上的经纬度转化为屏幕的点坐标，
-        Point p = mBaidumap.getProjection().toScreenLocation(selectLatLng);
         View v = monitorActivity.getLayoutInflater().inflate(R.layout.dialog_select, null);
-        Button btn = (Button) v.findViewById(R.id.temp_btn);
+        ((TextView) v.findViewById(R.id.location_msg)).setText(selectAddress);
+        ImageButton btn = (ImageButton) v.findViewById(R.id.send_way_btn);
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(monitorActivity, "点击相应成功", Toast.LENGTH_SHORT).show();
+                sendRoute();
             }
+
         });
         mInfoWindow = new InfoWindow(v, selectLatLng, -47);
         //显示InfoWindow
         mBaidumap.showInfoWindow(mInfoWindow);
+
+    }
+
+    /**
+     * 发送选中的路线
+     */
+    private void sendRoute() {
+        if (MsgHandle.getInstance().channel == null) {
+            Toast.makeText(monitorActivity, "当前网络异常，尚未连接服务器", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        //初始化路线信息
+        RouteWay routeWay = new RouteWay();
+        routeWay.startLocation = new LatLng(mLocation.latitude, mLocation.longitude);
+        routeWay.endLocation = selectLatLng;
+        routeWay.routePos = selectRoutePos;
+        routeWay.way_type = way_type;
+        routeWay.endAddress = selectAddress;
+        Log.d(Config.TAG, " routeWay.routePos  " + routeWay.routePos);
+        //发送消息到服务器
+        RouteWayRequest request = new RouteWayRequest();
+        request.from_id = MyApplication.getInstance().getSpUtil().getUser().id;
+        request.into_id = monitor.id;
+        request.routeWay = routeWay;
+        request.time = System.currentTimeMillis();
+        MyApplication.getInstance().getSendMsgUtil().sendMessageToServer(
+                MyApplication.getInstance().getGson().toJson(request)
+        );
+
+        //将信息放入消息表中
+        MapWayMsg mapWayMsg = new MapWayMsg();
+        mapWayMsg.routeWay = routeWay;
+        String msg = MyApplication.getInstance().getGson().toJson(mapWayMsg);
+        mapWayMsg.is_coming = Config.TO_MSG;
+        mapWayMsg.time = request.time;
+
+        MyApplication.getInstance().getMessageDao().addMessage(
+                monitor.id, mapWayMsg, msg);
+
+        Toast.makeText(monitorActivity, "路线已发送成功", Toast.LENGTH_SHORT).show();
+        doBack();
+        EventBus.getDefault().post(HandlerUtil.CHAT_UPDATE);
+    }
+
+
+    private boolean isMapWay = false;     //显示地图路线的标志值
+    private RouteWay routeWayTemp;
+
+    /**
+     * 显示地图路线信息
+     *
+     * @param mapWayMsg
+     */
+    public void showMapWay(MapWayMsg mapWayMsg) {
+        isMapWay = true;
+        routeWayTemp = mapWayMsg.routeWay;
+        way_type = routeWayTemp.way_type;
+        //打开地图标记界面
+        doMark();
+        ImageButton search_btn = (ImageButton) viewGroup.findViewById(R.id.search_btn);
+        search_btn.setVisibility(View.GONE);
+        more_btn.setVisibility(View.GONE);
+        location_message.setText("目的地:" + routeWayTemp.endAddress);
+
+        radioGroup.setEnabled(false);
+        viewGroup.findViewById(R.id.walk_radio).setEnabled(false);
+        viewGroup.findViewById(R.id.bus_radio).setEnabled(false);
+        viewGroup.findViewById(R.id.car_radio).setEnabled(false);
+        //查找路线
+        if (routeWayTemp.endLocation == null || routeWayTemp.startLocation == null) {
+            Toast.makeText(monitorActivity, "数据错误，查询失败", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        switch (way_type) {
+            case 0:
+                //查询步行
+                radioGroup.check(R.id.walk_radio);
+                WalkingRoutePlanOption walkOption = new WalkingRoutePlanOption();
+                walkOption.from(PlanNode.withLocation(routeWayTemp.startLocation));// 设置起点
+                walkOption.to(PlanNode.withLocation(routeWayTemp.endLocation));// 设置终点
+                routePlanSearch.walkingSearch(walkOption);       // 发起步行路线规划
+                break;
+            case 1:
+                //查询小车
+                radioGroup.check(R.id.car_radio);
+                DrivingRoutePlanOption drivingOption = new DrivingRoutePlanOption();
+                drivingOption.from(PlanNode.withLocation(routeWayTemp.startLocation));// 设置起点
+                drivingOption.to(PlanNode.withLocation(routeWayTemp.endLocation));// 设置终点
+                routePlanSearch.drivingSearch(drivingOption);       // 发起步行路线规划
+                break;
+            case 2:
+                //查询公交
+                radioGroup.check(R.id.bus_radio);
+                TransitRoutePlanOption transitOption = new TransitRoutePlanOption();
+                transitOption.from(PlanNode.withLocation(routeWayTemp.startLocation));// 设置起点
+                transitOption.to(PlanNode.withLocation(routeWayTemp.endLocation));// 设置终点
+                transitOption.city(city);
+                routePlanSearch.transitSearch(transitOption);       // 发起步行路线规划
+                break;
+        }
+
+        mBaidumap.setOnMapClickListener(null);
+        //等待对话框
+        waitDialog.show(monitorActivity.getSupportFragmentManager(), "LOADING_DIALOG");
+        waitDialog.setCancelable(false);
+        handler.sendEmptyMessageDelayed(HandlerUtil.SEAECH_ERROR, 10000);
 
     }
 
@@ -884,33 +1064,56 @@ public class MapFragment extends Fragment implements View.OnClickListener {
     }
 
 
-    private BitmapDescriptor mLocationIcon1;
-    private BitmapDescriptor mLocationIcon2;
-    private BitmapDescriptor mLocationIcon3;
-    private BitmapDescriptor mLocationIcon4;
-    private BitmapDescriptor mLocationIcon5;
-    private BitmapDescriptor mLocationIcon6;
-    private ArrayList<BitmapDescriptor> bitmapList;
+    /**
+     * 警告图标
+     */
+    private BitmapDescriptor warnIcon1;
+    private BitmapDescriptor warnIcon2;
+    private BitmapDescriptor warnIcon3;
+    private BitmapDescriptor warnIcon4;
+    private BitmapDescriptor warnIcon5;
+    private ArrayList<BitmapDescriptor> warnBitmapList;
+
+    /**
+     * 正常图标
+     */
+    private BitmapDescriptor normalIcon1;
+    private BitmapDescriptor normalIcon2;
+    private BitmapDescriptor normalIcon3;
+    private BitmapDescriptor normalIcon4;
+    private BitmapDescriptor normalIcon5;
+    private ArrayList<BitmapDescriptor> normalBitmapList;
 
     /**
      * 初始化动态图标
      */
     public void initAnim() {
-        mLocationIcon1 = BitmapDescriptorFactory.fromResource(R.drawable.red1);
-        mLocationIcon2 = BitmapDescriptorFactory.fromResource(R.drawable.red2);
-        mLocationIcon3 = BitmapDescriptorFactory.fromResource(R.drawable.red3);
-        mLocationIcon4 = BitmapDescriptorFactory.fromResource(R.drawable.red4);
-        mLocationIcon5 = BitmapDescriptorFactory.fromResource(R.drawable.red5);
-        //  mLocationIcon6 = BitmapDescriptorFactory.fromResource(R.drawable.head6);
-        bitmapList = new ArrayList<>();
-        bitmapList.add(mLocationIcon1);
-        bitmapList.add(mLocationIcon2);
-        bitmapList.add(mLocationIcon3);
-        bitmapList.add(mLocationIcon4);
-        bitmapList.add(mLocationIcon5);
-        //     bitmapList.add(mLocationIcon6);
-//
-        //  new Thread(runnable).start();
+        warnIcon1 = BitmapDescriptorFactory.fromResource(R.drawable.red1);
+        warnIcon2 = BitmapDescriptorFactory.fromResource(R.drawable.red2);
+        warnIcon3 = BitmapDescriptorFactory.fromResource(R.drawable.red3);
+        warnIcon4 = BitmapDescriptorFactory.fromResource(R.drawable.red4);
+        warnIcon5 = BitmapDescriptorFactory.fromResource(R.drawable.red5);
+
+        warnBitmapList = new ArrayList<>();
+        warnBitmapList.add(warnIcon1);
+        warnBitmapList.add(warnIcon2);
+        warnBitmapList.add(warnIcon3);
+        warnBitmapList.add(warnIcon4);
+        warnBitmapList.add(warnIcon5);
+
+        normalIcon1 = BitmapDescriptorFactory.fromResource(R.drawable.green1);
+        normalIcon2 = BitmapDescriptorFactory.fromResource(R.drawable.green2);
+        normalIcon3 = BitmapDescriptorFactory.fromResource(R.drawable.green3);
+        normalIcon4 = BitmapDescriptorFactory.fromResource(R.drawable.green4);
+        normalIcon5 = BitmapDescriptorFactory.fromResource(R.drawable.green5);
+
+        normalBitmapList = new ArrayList<>();
+        normalBitmapList.add(normalIcon1);
+        normalBitmapList.add(normalIcon2);
+        normalBitmapList.add(normalIcon3);
+        normalBitmapList.add(normalIcon4);
+        normalBitmapList.add(normalIcon5);
+
     }
 
     /**
@@ -939,6 +1142,7 @@ public class MapFragment extends Fragment implements View.OnClickListener {
                 break;
         }
 
+        ArrayList<BitmapDescriptor> bitmapList;
         if (!isContains) {
             //将所有监护区域都绘制出来
             for (LocationRange range : rangeList) {
@@ -948,11 +1152,14 @@ public class MapFragment extends Fragment implements View.OnClickListener {
                     drawPolygon(range.points);
                 }
             }
+            bitmapList = warnBitmapList;
+        } else {
+            bitmapList = normalBitmapList;
         }
 
         OverlayOptions option = new MarkerOptions()
                 .icons(bitmapList)
-                .period(25)        //设置多少帧刷新一次图片资源
+                .period(20)        //设置多少帧刷新一次图片资源
                 .anchor(0.5f, 0.5f)      //中心点对齐对齐坐标的中心点
                 .position(new LatLng(mLocation.latitude, mLocation.longitude));
 
@@ -988,4 +1195,14 @@ public class MapFragment extends Fragment implements View.OnClickListener {
             mBaidumap.addOverlay(polygonOption);
         }
     }
+
+    public RouteonClickListener routeonClickListener = new RouteonClickListener() {
+        @Override
+        public void onRouteCLick(int click_pos) {
+            selectRoutePos = click_pos;
+            Log.d(Config.TAG, "点击了：" + click_pos);
+        }
+    };
+
+
 }

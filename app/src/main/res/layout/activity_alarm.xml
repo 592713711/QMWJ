@@ -1,0 +1,66 @@
+<com.zhy.android.percent.support.PercentRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#f0f0f0"
+    android:clipToPadding="true"
+    android:fitsSystemWindows="true"
+    tools:context="control.phone.alarm.AlarmActivity">
+
+    <com.zhy.android.percent.support.PercentRelativeLayout
+        android:id="@+id/head"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="#29b6f6"
+        app:layout_heightPercent="7%"
+        app:layout_widthPercent="100%">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:text="闹钟"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@android:color/white"
+            android:textSize="20sp"
+            app:layout_marginTopPercent="20%" />
+
+        <ImageButton
+            android:id="@+id/quit_btn"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_centerVertical="true"
+            android:background="#00000000"
+            android:onClick="doQuit"
+            android:scaleType="fitXY"
+            android:src="@drawable/quit_btn"
+            app:layout_heightPercent="50%h"
+            app:layout_marginLeftPercent="5%"
+            app:layout_widthPercent="50%h" />
+
+        <ImageButton
+            android:id="@+id/add_btn"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:background="#00000000"
+            android:onClick="doAddAlarm"
+            android:scaleType="fitXY"
+            android:src="@drawable/ic_add"
+            app:layout_heightPercent="50%h"
+            app:layout_marginRightPercent="5%"
+            app:layout_widthPercent="50%h" />
+
+    </com.zhy.android.percent.support.PercentRelativeLayout>
+
+    <control.phone.alarm.HorizontalSlideDeleteListView
+        android:id="@+id/alarm_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/head"
+        android:layout_marginTop="10dp" />
+
+</com.zhy.android.percent.support.PercentRelativeLayout>
