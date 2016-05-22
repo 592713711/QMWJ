@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import control.phone.alarm.AlarmActivity;
+import control.phone.audio.AudioActivity;
 import control.phone.health.MiBandActivity;
 import under_control.home.miband.HeartActivity;
 import control.phone.linkman.LinkManActivity;
@@ -41,7 +42,7 @@ public class PhoneFragment extends Fragment implements AdapterView.OnItemClickLi
             R.drawable.health_btn, R.drawable.bluetooth_btn, R.drawable.setting_btn,
             R.drawable.clock_btn, R.drawable.cost_btn, R.drawable.close_btn};
     private String[] iconName = {"联系人", "短信监控", "健康心率", "蓝牙随行", "手机设置", "闹钟设置", "话费查询",
-            "远程关机"};
+            "实时语音"};
 
     public PhoneFragment(Monitor monitor, Context context) {
         this.monitor = monitor;
@@ -118,6 +119,12 @@ public class PhoneFragment extends Fragment implements AdapterView.OnItemClickLi
             case 5:
                 //打开闹钟活动
                 intent = new Intent(context, AlarmActivity.class);
+                intent.putExtra("monitor", monitor);
+                startActivity(intent);
+                break;
+            case 7:
+                //打开闹钟活动
+                intent = new Intent(context, AudioActivity.class);
                 intent.putExtra("monitor", monitor);
                 startActivity(intent);
                 break;

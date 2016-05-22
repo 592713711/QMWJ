@@ -394,6 +394,11 @@ public class LocationRangeActivity extends AppCompatActivity implements View.OnC
             }
         }
 
+        /**
+         * 地图自带覆盖物点击回调
+         * @param mapPoi
+         * @return
+         */
         @Override
         public boolean onMapPoiClick(MapPoi mapPoi) {
             if (draw_box.isChecked()) {
@@ -406,6 +411,9 @@ public class LocationRangeActivity extends AppCompatActivity implements View.OnC
         }
     };
 
+    /**
+     * 覆盖物点击监听器
+     */
     public BaiduMap.OnMarkerClickListener onMarkerClickListener = new BaiduMap.OnMarkerClickListener() {
         @Override
         public boolean onMarkerClick(Marker marker) {
@@ -882,6 +890,10 @@ public class LocationRangeActivity extends AppCompatActivity implements View.OnC
         mMapView.onDestroy();
         // 释放地理编码检索实例
         geoCoder.destroy();
+    }
+
+    public void doQuit(View v) {
+        finish();
     }
 
 }

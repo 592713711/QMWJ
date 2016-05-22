@@ -224,7 +224,9 @@ public class AddLocationRangeActivity extends AppCompatActivity implements Adapt
 
 
     }
-
+    public void doQuit(View v) {
+        finish();
+    }
 
  /*   private ActionMode.Callback mCallback = new ActionMode.Callback() {
 

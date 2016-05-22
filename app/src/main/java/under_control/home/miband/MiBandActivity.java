@@ -373,4 +373,9 @@ public class MiBandActivity extends AppCompatActivity implements OnClickListener
         super.onDestroy();
         EventBus.getDefault().unregister(this);
     }
+
+    public void doQuit(View v) {
+        finish();
+    }
+
 }

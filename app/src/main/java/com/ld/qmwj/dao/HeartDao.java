@@ -81,6 +81,24 @@ public class HeartDao {
     }
 
     /**
+     * 得到最后一次测量的结果
+     *
+     * @param id
+     * @return
+     */
+    public HeartData getHeartLast(int id) {
+        Cursor cursor = db.query(TABLE_NAME, ALLCOL, COL_MONITOR_ID + "=" + id, null, null, null, COL_TIME + " desc", null);
+        HeartData heartData = null;
+        if (cursor.moveToNext()) {
+            heartData=new HeartData();
+            heartData.data = cursor.getInt(0);
+            heartData.time = cursor.getLong(1);
+        }
+        return heartData;
+
+    }
+
+    /**
      * 得到所有数据
      *
      * @param id
@@ -125,12 +143,12 @@ public class HeartDao {
      * 更新心跳数据
      * 先时间删除区间中的数据 再将数据添加进去
      */
-    public void updateHeartData(int id,ArrayList<HeartData> datas,long from_time,long to_time){
+    public void updateHeartData(int id, ArrayList<HeartData> datas, long from_time, long to_time) {
         //删除区间的数据
-        deleteHeartData(id,from_time,to_time);
+        deleteHeartData(id, from_time, to_time);
 
-        for(HeartData data:datas){
-            ContentValues values=new ContentValues();
+        for (HeartData data : datas) {
+            ContentValues values = new ContentValues();
             values.put(COL_MONITOR_ID, id);
             values.put(COL_DATA, data.data);
             values.put(COL_TIME, data.time);
@@ -141,11 +159,12 @@ public class HeartDao {
 
     /**
      * 根据时间区间删除数据
+     *
      * @param from_time
      * @param to_time
      */
-    public void deleteHeartData(int id,long from_time,long to_time){
-        db.delete(TABLE_NAME,COL_MONITOR_ID + "=" + id + " and " + COL_TIME + ">" + from_time + " and " + COL_TIME + "<" + to_time,null);
+    public void deleteHeartData(int id, long from_time, long to_time) {
+        db.delete(TABLE_NAME, COL_MONITOR_ID + "=" + id + " and " + COL_TIME + ">" + from_time + " and " + COL_TIME + "<" + to_time, null);
     }
 
 }

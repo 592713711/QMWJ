@@ -30,6 +30,8 @@ public class HandlerUtil {
     public static final int AUTH_MSG=24;     //测量心跳数据
     public static final int RECEIVE_BLACKPHONE=25;     //收到黑名单
     public static final int UPDATE_ALARM=26;        //更新闹钟
+    public static final int OPEN_VOICE=27;        //开启声音监控
+    public static final int CLOSE_VOICE=28;        //关闭声音监控
 
 
 }

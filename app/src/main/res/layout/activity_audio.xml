@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.zhy.android.percent.support.PercentRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:voiceView="http://schemas.android.com/apk/res-auto"
+    android:clipToPadding="true"
+    android:fitsSystemWindows="true"
+    tools:context="control.phone.sms.SmsContentActivity">
+
+    <com.zhy.android.percent.support.PercentRelativeLayout
+        android:id="@+id/head"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="#3b8bdc"
+        app:layout_heightPercent="7%"
+        app:layout_widthPercent="100%">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:text="实时声音"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            app:layout_marginTopPercent="20%" />
+
+        <ImageButton
+            android:id="@+id/quit_btn"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_centerVertical="true"
+            android:background="#00000000"
+            android:onClick="doQuit"
+            android:scaleType="fitXY"
+            android:src="@drawable/quit_btn"
+            app:layout_heightPercent="60%h"
+            app:layout_marginLeftPercent="3%"
+            app:layout_widthPercent="60%h" />
+    </com.zhy.android.percent.support.PercentRelativeLayout>
+
+    <com.zhy.android.percent.support.PercentRelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/head"
+        android:background="@drawable/record_bg">
+
+        <com.dd.morphingbutton.impl.IndeterminateProgressButton
+            android:id="@+id/btnMorph"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:text="开启声音监控"
+            android:textColor="@android:color/white"
+            app:layout_marginBottomPercent="10%" />
+
+        <ImageView
+            android:id="@+id/voice_mic_view"
+            android:layout_width="50dip"
+            android:layout_height="100dip"
+            android:layout_centerHorizontal="true"
+            app:layout_marginTopPercent="30%"
+            android:src="@drawable/voice_mic" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@+id/voice_mic_view"
+            android:text="开启监控中"
+            android:id="@+id/hint"
+            android:layout_marginTop="20dp"
+            android:textColor="@color/white"
+            android:textSize="20sp"/>
+
+        <com.carlos.voiceline.mylibrary.VoiceLineView
+            android:id="@+id/voicLine"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_heightPercent="40%h"
+            voiceView:maxVolume="100"
+            android:layout_centerInParent="true"
+            voiceView:middleLine="#a1e7f7"
+            voiceView:middleLineHeight="1dp"
+            voiceView:fineness="three"
+            voiceView:rectSpace="4dp"
+            voiceView:rectWidth="4dp"
+            voiceView:sensibility="four"
+            voiceView:viewMode="line"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            voiceView:voiceLine="#a1e7f7" />
+
+    </com.zhy.android.percent.support.PercentRelativeLayout>
+
+
+</com.zhy.android.percent.support.PercentRelativeLayout>

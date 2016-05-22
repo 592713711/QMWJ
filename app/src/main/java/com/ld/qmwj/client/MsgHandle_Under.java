@@ -23,6 +23,7 @@ import com.ld.qmwj.message.response.HeartDataResponse;
 import com.ld.qmwj.message.response.LinkManResponse;
 import com.ld.qmwj.message.response.LocationRes;
 import com.ld.qmwj.message.response.OldWayResponse;
+import com.ld.qmwj.message.response.OpenVoiceResponse;
 import com.ld.qmwj.message.response.Response;
 import com.ld.qmwj.model.Alarm;
 import com.ld.qmwj.model.BandState;
@@ -310,5 +311,16 @@ public class MsgHandle_Under {
         }
 
         EventBus.getDefault().post(request);
+    }
+
+    public void handleOpenVoice(String msgJson) {
+        //开启语音录制
+
+        OpenVoiceResponse response=gson.fromJson(msgJson,OpenVoiceResponse.class);
+        MyApplication.getInstance().getAudioWrapper().setServerPort(response.port);
+        Log.d(Config.TAG,"port:"+response.port);
+        MyApplication.getInstance().getAudioWrapper().stopRecord();
+        Log.d(Config.TAG, "开启语音监听");
+        MyApplication.getInstance().getAudioWrapper().startRecord();
     }
 }

@@ -12,6 +12,7 @@ import com.ld.qmwj.MyApplication;
 import com.ld.qmwj.model.chatmessage.ChatMessage;
 import com.ld.qmwj.model.chatmessage.MapWayMsg;
 import com.ld.qmwj.model.chatmessage.PhoneStateMsg;
+import com.ld.qmwj.model.chatmessage.RecordMsg;
 import com.ld.qmwj.model.chatmessage.SimpleMsg;
 import com.ld.qmwj.model.chatmessage.SmsMsg;
 
@@ -119,6 +120,11 @@ public class MessageDao {
                     break;
                 case Config.WARN_MSG:
                     break;
+                case Config.RECORD_MSG:
+                    RecordMsg recordMsg=gson.fromJson(msg,RecordMsg.class);
+                    chatMessage=recordMsg;
+                    break;
+
 
             }
             chatMessage.is_coming=isComing;

@@ -6,13 +6,15 @@
 
 
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="88dp"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="70dp"
+        android:layout_height="wrap_content"
         android:text="New Button"
         android:id="@+id/button"
-        android:layout_centerVertical="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginStart="47dp" />
+        android:layout_marginStart="53dp"
+        android:layout_marginTop="141dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true" />
 
     <Button
         android:layout_width="wrap_content"
@@ -21,6 +23,5 @@
         android:id="@+id/button2"
         android:layout_alignBottom="@+id/button"
         android:layout_toEndOf="@+id/button" />
-
 
 </RelativeLayout>

@@ -188,6 +188,8 @@ public class MonitorActivity extends AppCompatActivity {
         }
     }
 
+    public long lastShowUnlinetime = 0;       //最后一次显示不在线的时间
+
     /**
      * 控制提示框的显示与消失
      */
@@ -207,20 +209,21 @@ public class MonitorActivity extends AppCompatActivity {
         } else if (monitor.state == Config.NOT_ONLINE_STATE) {
             hintMessage.setText("对方未连接");
             hintLayout.setVisibility(View.VISIBLE);
-            if (mapFragment != null) {
-                mapFragment.handler.removeMessages(HandlerUtil.REQUEST_ERROR);
-                if (mapFragment.waitDialog != null)
-                    mapFragment.waitDialog.dismiss();
-                if (isStart)
+            if (mapFragment != null && mapFragment.waitDialog != null)
+                //mapFragment.waitDialog.dismiss();
+            if (isStart) {
+                long nowtime = System.currentTimeMillis();
+                if (nowtime - lastShowUnlinetime > 3000)
                     Toast.makeText(this, "对方网络问题，未能获得数据", Toast.LENGTH_SHORT).show();
-                return;
+                lastShowUnlinetime = nowtime;
             }
+            return;
+
         }
     }
 
     public void doQuit(View v) {
         finish();
-
     }
 
     /**
@@ -257,15 +260,7 @@ public class MonitorActivity extends AppCompatActivity {
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void showInfo(Integer tag) {
-        if (tag == HandlerUtil.LOCATION_RESPONSE) {
-            //收到位置响应
-            MyLocation location = MyApplication.getInstance().getRelateDao().getLocation(monitor.id);
-            mapFragment.handler.removeMessages(HandlerUtil.REQUEST_ERROR);
-            mapFragment.waitDialog.dismiss();
-            Toast.makeText(MonitorActivity.this, "更新了对方位置", Toast.LENGTH_SHORT).show();
-            mapFragment.updateLocation(location);
-
-        } else if (tag == HandlerUtil.STATE_RESPONSE) {
+        if (tag == HandlerUtil.STATE_RESPONSE) {
             //更新对方状态
             monitor = MyApplication.getInstance().getRelateDao().getMonitorById(monitor.id);
             updateHint();

@@ -98,4 +98,8 @@ public class AlarmActivity extends AppCompatActivity {
         }
         win.setAttributes(winParams);
     }
+
+    public void doQuit(View v) {
+        finish();
+    }
 }

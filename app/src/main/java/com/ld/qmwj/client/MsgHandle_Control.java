@@ -5,6 +5,7 @@ import android.os.Message;
 import android.util.Log;
 
 import com.baidu.mapapi.model.LatLng;
+import com.baidu.mapapi.utils.SpatialRelationUtil;
 import com.google.gson.Gson;
 import com.ld.qmwj.Config;
 import com.ld.qmwj.MyApplication;
@@ -15,7 +16,10 @@ import com.ld.qmwj.message.response.HeartDataResponse;
 import com.ld.qmwj.message.response.LinkManResponse;
 import com.ld.qmwj.message.response.LocationRes;
 import com.ld.qmwj.message.response.OldWayResponse;
+import com.ld.qmwj.message.response.OpenVoiceResponse;
 import com.ld.qmwj.message.response.SmsResponse;
+import com.ld.qmwj.model.HeartData;
+import com.ld.qmwj.model.LocationRange;
 import com.ld.qmwj.model.PhoneState;
 import com.ld.qmwj.model.Sms;
 import com.ld.qmwj.model.chatmessage.PhoneStateMsg;
@@ -51,6 +55,27 @@ public class MsgHandle_Control {
         LocationRes locationRes = gson.fromJson(msgJson, LocationRes.class);
         //将位置信息写入表中
         MyApplication.getInstance().getRelateDao().insertLocation(locationRes.from_id, locationRes.myLocation);
+        //判断与安全区域是否安全
+        ArrayList<LocationRange> rangeList = MyApplication.getInstance().getAuthDao().getLocationRanges(locationRes.from_id);
+        LatLng latLng = new LatLng(locationRes.myLocation.latitude, locationRes.myLocation.longitude);
+        boolean isSafe = false;
+        for (LocationRange range : rangeList) {
+            if (range.latLng != null) {
+                isSafe = SpatialRelationUtil.isCircleContainsPoint(range.latLng, range.range, latLng);
+            } else {
+                isSafe = SpatialRelationUtil.isPolygonContainsPoint(range.points, latLng);
+            }
+            if (isSafe)
+                break;
+        }
+        if (rangeList.size() == 0)
+            MyApplication.getInstance().getRelateDao().updateSafe(locationRes.from_id, Config.WEIZHI_LOCATION);
+        else if (isSafe)
+            MyApplication.getInstance().getRelateDao().updateSafe(locationRes.from_id, Config.SAFE_LOCATION);
+        else
+            MyApplication.getInstance().getRelateDao().updateSafe(locationRes.from_id, Config.UNSAFE_LOCATION);
+
+
         EventBus.getDefault().post(HandlerUtil.LOCATION_RESPONSE);
 
     }
@@ -82,25 +107,25 @@ public class MsgHandle_Control {
      */
     public void handleCallPhone(String msgJson) {
         CallPhoneRes callPhoneRes = gson.fromJson(msgJson, CallPhoneRes.class);
-        PhoneState phoneState=callPhoneRes.phoneState;
+        PhoneState phoneState = callPhoneRes.phoneState;
 
         //短信时间和现在时间对比，若比现在时间还大，则变为现在时间
-        if(phoneState.getEndTime()>System.currentTimeMillis()){
+        if (phoneState.getEndTime() > System.currentTimeMillis()) {
             phoneState.setEndTime(System.currentTimeMillis());
         }
 
         //将通话记录放入通话表中
         MyApplication.getInstance().getCallPhoneDao().insertCallPhone(callPhoneRes.from_id, phoneState);
         //放入信息表中
-        PhoneStateMsg phoneStateMsg=new PhoneStateMsg();
-        phoneStateMsg.phoneNum=phoneState.getPhonenum();
-        phoneStateMsg.phonename=phoneState.getName();
-        phoneStateMsg.call_Type=phoneState.getType();
-        String msg=gson.toJson(phoneStateMsg);
-        phoneStateMsg.is_coming=Config.FROM_MSG;
-        phoneStateMsg.time=phoneState.getEndTime();
+        PhoneStateMsg phoneStateMsg = new PhoneStateMsg();
+        phoneStateMsg.phoneNum = phoneState.getPhonenum();
+        phoneStateMsg.phonename = phoneState.getName();
+        phoneStateMsg.call_Type = phoneState.getType();
+        String msg = gson.toJson(phoneStateMsg);
+        phoneStateMsg.is_coming = Config.FROM_MSG;
+        phoneStateMsg.time = phoneState.getEndTime();
         MyApplication.getInstance().getMessageDao().addMessage(
-                callPhoneRes.from_id,phoneStateMsg,msg);
+                callPhoneRes.from_id, phoneStateMsg, msg);
         //发送收到通话记录事件
         EventBus.getDefault().post(HandlerUtil.CALLPHONE_RESPONSE);
     }
@@ -118,25 +143,25 @@ public class MsgHandle_Control {
     }
 
     public void handleSms(String msgJson) {
-        SmsResponse smsResponse=gson.fromJson(msgJson,SmsResponse.class);
-        Sms sms=smsResponse.sms;
+        SmsResponse smsResponse = gson.fromJson(msgJson, SmsResponse.class);
+        Sms sms = smsResponse.sms;
 
 
         //短信时间和现在时间对比，若比现在时间还大，则变为现在时间
-        if(sms.getDate()>System.currentTimeMillis()){
+        if (sms.getDate() > System.currentTimeMillis()) {
             sms.setDate(System.currentTimeMillis());
         }
 
         //放入信息表中
         MyApplication.getInstance().getSmsDao().insertSms(smsResponse.from_id, sms);
         //放入信息表
-        SmsMsg smsMsg=new SmsMsg();
-        smsMsg.smsNum=sms.getPhoneNumber();
-        smsMsg.smsName=sms.getName();
-        smsMsg.smsType=sms.getType();
-        String msg=gson.toJson(smsMsg);
-        smsMsg.is_coming=Config.FROM_MSG;
-        smsMsg.time=sms.getDate();
+        SmsMsg smsMsg = new SmsMsg();
+        smsMsg.smsNum = sms.getPhoneNumber();
+        smsMsg.smsName = sms.getName();
+        smsMsg.smsType = sms.getType();
+        String msg = gson.toJson(smsMsg);
+        smsMsg.is_coming = Config.FROM_MSG;
+        smsMsg.time = sms.getDate();
 
 
         MyApplication.getInstance().getMessageDao().addMessage(
@@ -147,33 +172,44 @@ public class MsgHandle_Control {
 
     /**
      * 处理手环状态响应
+     *
      * @param msgJson
      */
     public void handleBandState(String msgJson) {
-        BandStateRes bandStateRes=gson.fromJson(msgJson,BandStateRes.class);
+        BandStateRes bandStateRes = gson.fromJson(msgJson, BandStateRes.class);
+        MyApplication.getInstance().getRelateDao().alterBandState(bandStateRes.from_id, bandStateRes.bandState);
         EventBus.getDefault().post(bandStateRes.bandState);
     }
 
     /**
      * 处理心跳请求响应
+     *
      * @param msgJson
      */
     public void handleDoHeart(String msgJson) {
-        DoHeartRes doHeartRes=gson.fromJson(msgJson,DoHeartRes.class);
+        DoHeartRes doHeartRes = gson.fromJson(msgJson, DoHeartRes.class);
         //保存心跳数据
         MyApplication.getInstance().getHeartDao().insertHeartData(
                 doHeartRes.from_id,
                 doHeartRes.heartData
         );
+        MyApplication.getInstance().getRelateDao().updateHeart(doHeartRes.from_id, doHeartRes.heartData);
         EventBus.getDefault().post(doHeartRes.heartData);
     }
 
     public void handleHeartData(String msgJson) {
-        HeartDataResponse response=gson.fromJson(msgJson,HeartDataResponse.class);
+        HeartDataResponse response = gson.fromJson(msgJson, HeartDataResponse.class);
         MyApplication.getInstance().getHeartDao().updateHeartData(
-                response.from_id,response.datas,response.from_time,response.to_timie
+                response.from_id, response.datas, response.from_time, response.to_timie
         );
-
+        HeartData lastHeartdata= MyApplication.getInstance().getHeartDao().getHeartLast(response.from_id);
+        MyApplication.getInstance().getRelateDao().updateHeart(response.from_id,lastHeartdata);
+        EventBus.getDefault().post(lastHeartdata);
         EventBus.getDefault().post(HandlerUtil.UPDATEHEARTDATA);
+    }
+
+    public void handleOpenVoice(String msgJson) {
+        OpenVoiceResponse response = gson.fromJson(msgJson, OpenVoiceResponse.class);
+        EventBus.getDefault().post(response);
     }
 }

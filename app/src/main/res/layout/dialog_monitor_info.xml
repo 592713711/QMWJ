@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.zhy.android.percent.support.PercentRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/bubble">
+
+
+    <TextView
+        android:id="@+id/text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="连接状态："
+        android:textColor="@android:color/black" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/text"
+        android:layout_toEndOf="@+id/text"
+        android:text="未连接"
+        android:id="@+id/contect_state_text"
+        android:textColor="@color/not_online_state" />
+
+
+    <TextView
+        android:id="@+id/text3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="位置状态："
+        android:layout_marginTop="5dp"
+        android:layout_below="@+id/text"
+        android:layout_alignEnd="@+id/text"
+        android:textColor="@android:color/black" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/contect_state_text"
+        android:layout_alignBottom="@+id/text3"
+        android:text="安全"
+        android:id="@+id/location_state_text"
+        android:textColor="@color/bindbg" />
+
+    <TextView
+        android:id="@+id/text4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="手环状态："
+        android:layout_marginTop="5dp"
+        android:layout_below="@+id/text3"
+        android:layout_alignEnd="@+id/text"
+        android:textColor="@android:color/black" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/contect_state_text"
+        android:layout_alignBottom="@+id/text4"
+        android:text="未连接"
+        android:id="@+id/miband_state_text"
+        android:textColor="#a0a0a0"/>
+
+
+    <TextView
+        android:id="@+id/text5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="心率："
+        android:layout_marginTop="5dp"
+        android:layout_below="@+id/text4"
+        android:layout_alignEnd="@+id/text"
+        android:textColor="@android:color/black" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/contect_state_text"
+        android:layout_alignBottom="@+id/text5"
+        android:text="124"
+        android:id="@+id/heart_data_text"
+        android:textColor="@color/red"/>
+
+    <TextView
+        android:layout_width="1dp"
+        android:layout_height="20dp"
+        android:layout_alignBottom="@+id/text5"
+        android:layout_alignTop="@+id/text"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:id="@id/fenggexian"
+        android:layout_toEndOf="@+id/contect_state_text"
+        android:background="#e0e0e0" />
+
+    <ImageView
+        android:id="@+id/panorama_view"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:scaleType="fitXY"
+        android:clickable="true"
+        android:src="@drawable/head1"
+        android:layout_marginLeft="7dp"
+        android:layout_alignTop="@+id/text"
+        android:layout_alignBottom="@+id/text5"
+        android:layout_toEndOf="@+id/fenggexian"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"/>
+
+</com.zhy.android.percent.support.PercentRelativeLayout>

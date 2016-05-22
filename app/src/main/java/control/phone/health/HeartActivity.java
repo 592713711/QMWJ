@@ -323,4 +323,8 @@ public class HeartActivity extends AppCompatActivity implements HeartView.StopRi
         super.onStop();
         EventBus.getDefault().unregister(this);
     }
+
+    public void doQuit(View v) {
+        finish();
+    }
 }

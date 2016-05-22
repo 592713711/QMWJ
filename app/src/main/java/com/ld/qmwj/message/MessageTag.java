@@ -89,5 +89,13 @@ public class MessageTag {
     //更新闹钟
     public static final int UPDATEALARM_REQ = 35;
 
+    //发送语音消息
+    public static final int RECORD_REQ = 36;
+
+    //开启、关闭 实时声音监控请求
+    public static final int OPEN_VOICE_REQ = 37;
+    public static final int CLOSE_VOICE_REQ = 38;
+    public static final int OPEN_VOICE_RES = 39;
+
 }
 

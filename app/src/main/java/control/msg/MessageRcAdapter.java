@@ -20,6 +20,7 @@ import com.ld.qmwj.model.RouteWay;
 import com.ld.qmwj.model.chatmessage.ChatMessage;
 import com.ld.qmwj.model.chatmessage.MapWayMsg;
 import com.ld.qmwj.model.chatmessage.PhoneStateMsg;
+import com.ld.qmwj.model.chatmessage.RecordMsg;
 import com.ld.qmwj.model.chatmessage.SimpleMsg;
 import com.ld.qmwj.model.chatmessage.SmsMsg;
 import com.ld.qmwj.util.TimeUtil;
@@ -40,6 +41,8 @@ public class MessageRcAdapter extends RecyclerView.Adapter {
     public static final int HINT_FROM_TYPE = 2;
     public static final int MAPWAY_SEND_TYPE = 3;
     public static final int MAPWAY_FROM_TYPE = 4;
+    public static final int VOICE_FROM_TYPE = 5;
+    public static final int VOICE_SEND_TYPE = 6;
 
     public MessageRcAdapter(Context context) {
         this.context = context;
@@ -83,6 +86,15 @@ public class MessageRcAdapter extends RecyclerView.Adapter {
                 v = inflater.inflate(R.layout.mapway_from_item, null);
                 holder = new MapWaySendHolder(v, myRcClickListener);
                 break;
+            case VOICE_FROM_TYPE:
+                v = inflater.inflate(R.layout.voice_from_item, null);
+                holder = new HintFromHolder(v, myRcClickListener);
+                break;
+            case VOICE_SEND_TYPE:
+                v = inflater.inflate(R.layout.voice_send_item, null);
+                holder = new HintFromHolder(v, myRcClickListener);
+                break;
+
 
         }
 
@@ -165,6 +177,28 @@ public class MessageRcAdapter extends RecyclerView.Adapter {
                 hintFromHolder.hintText1.setText(hint);
                 hintFromHolder.iconImage.setImageBitmap(icon);
 
+            }else if(cm.msg_type == Config.RECORD_MSG){
+                //语音信息
+                RecordMsg recordMsg= (RecordMsg) cm;
+                int time=recordMsg.duration;
+                hintFromHolder.hintText2.setText(time+"”");
+
+                //控制信息宽度
+                if(time<5&&time>=3)
+                    hintFromHolder.hintText1.setText("\t");
+                else  if(time<8&&time>=5)
+                    hintFromHolder.hintText1.setText("\t\t\t");
+                else if(time<12&&time>=8)
+                    hintFromHolder.hintText1.setText("\t\t\t\t\t");
+                else if(time<15&&time>=12)
+                    hintFromHolder.hintText1.setText("\t\t\t\t\t\t");
+                else if(time<20&&time>=15)
+                    hintFromHolder.hintText1.setText("\t\t\t\t\t\t\t");
+                else if(time<30&&time>=20)
+                    hintFromHolder.hintText1.setText("\t\t\t\t\t\t\t\t");
+                else if(time>30)
+                    hintFromHolder.hintText1.setText("\t\t\t\t\t\t\t\t\t");
+
             }
         }
 
@@ -196,6 +230,8 @@ public class MessageRcAdapter extends RecyclerView.Adapter {
                     return HINT_FROM_TYPE;
                 case Config.MAPWAY_MSG:
                     return MAPWAY_FROM_TYPE;
+                case Config.RECORD_MSG:
+                    return VOICE_FROM_TYPE;
             }
 
         } else {
@@ -203,6 +239,8 @@ public class MessageRcAdapter extends RecyclerView.Adapter {
                 return CHAT_SEND_TYPE;
             } else if (cm.msg_type == Config.MAPWAY_MSG) {
                 return MAPWAY_SEND_TYPE;
+            } else if (cm.msg_type == Config.RECORD_MSG) {
+                return VOICE_SEND_TYPE;
             }
         }
 
@@ -223,7 +261,7 @@ public class MessageRcAdapter extends RecyclerView.Adapter {
 
         public MyViewHolder(View itemView, MyRecycleViewItemListener onClickListener) {
             super(itemView);
-            this.onClickListener=onClickListener;
+            this.onClickListener = onClickListener;
             time = (TextView) itemView.findViewById(R.id.chat_createDate);
             headView = (ImageView) itemView.findViewById(R.id.chat_icon);
 
@@ -281,7 +319,6 @@ public class MessageRcAdapter extends RecyclerView.Adapter {
         TextView hintText1;
         TextView hintText2;
         RelativeLayout layout;
-        MyRecycleViewItemListener onClickListener;
 
         public MapWaySendHolder(View itemView, MyRecycleViewItemListener onClickListener) {
             super(itemView, onClickListener);

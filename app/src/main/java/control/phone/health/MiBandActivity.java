@@ -180,7 +180,7 @@ public class MiBandActivity extends AppCompatActivity implements OnClickListener
     }
 
     /**
-     * //收到手环状态响应
+     * 收到手环状态响应
      *
      * @param bandState
      */
@@ -302,4 +302,7 @@ public class MiBandActivity extends AppCompatActivity implements OnClickListener
         EventBus.getDefault().unregister(this);
     }
 
+    public void doQuit(View v) {
+        finish();
+    }
 }

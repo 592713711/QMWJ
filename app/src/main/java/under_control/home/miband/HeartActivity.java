@@ -264,4 +264,9 @@ public class HeartActivity extends AppCompatActivity implements View.OnClickList
         intent.putExtra("monitor_id", MyApplication.getInstance().getSpUtil().getUser().id);
         startActivity(intent);
     }
+
+    public void doQuit(View v) {
+        finish();
+    }
+
 }

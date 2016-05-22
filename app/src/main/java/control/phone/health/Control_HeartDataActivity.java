@@ -194,4 +194,8 @@ public class Control_HeartDataActivity extends HeartDataActivity {
         EventBus.getDefault().unregister(this);
     }
 
+    public void doQuit(View v) {
+        finish();
+    }
+
 }

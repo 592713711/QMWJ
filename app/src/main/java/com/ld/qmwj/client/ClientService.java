@@ -22,7 +22,6 @@ public class ClientService extends Service implements Config {
     public void onCreate() {
         super.onCreate();
 
-
         //开启线程（服务是工作在主线程上） 用来启动客户端与服务器的连接
         Thread thread = new Thread(new Runnable() {
             @Override

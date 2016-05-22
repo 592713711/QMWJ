@@ -3,6 +3,7 @@ package control.map;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
@@ -21,11 +22,15 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
+import com.baidu.lbsapi.BMapManager;
+import com.baidu.lbsapi.panoramaview.PanoramaView;
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
@@ -54,6 +59,7 @@ import com.baidu.mapapi.search.geocode.GeoCoder;
 import com.baidu.mapapi.search.geocode.OnGetGeoCoderResultListener;
 import com.baidu.mapapi.search.geocode.ReverseGeoCodeOption;
 import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
+import com.baidu.mapapi.search.route.BikingRouteResult;
 import com.baidu.mapapi.search.route.DrivingRoutePlanOption;
 import com.baidu.mapapi.search.route.DrivingRouteResult;
 import com.baidu.mapapi.search.route.OnGetRoutePlanResultListener;
@@ -68,7 +74,12 @@ import com.ld.qmwj.Config;
 import com.ld.qmwj.MyApplication;
 import com.ld.qmwj.R;
 import com.ld.qmwj.client.MsgHandle;
+import com.ld.qmwj.message.MessageTag;
+import com.ld.qmwj.message.request.HeartDataRequest;
+import com.ld.qmwj.message.request.Request;
 import com.ld.qmwj.message.request.RouteWayRequest;
+import com.ld.qmwj.model.BandState;
+import com.ld.qmwj.model.HeartData;
 import com.ld.qmwj.model.LocationRange;
 import com.ld.qmwj.model.Monitor;
 import com.ld.qmwj.model.MyLocation;
@@ -77,8 +88,12 @@ import com.ld.qmwj.model.chatmessage.MapWayMsg;
 import com.ld.qmwj.util.HandlerUtil;
 import com.ld.qmwj.util.TimeUtil;
 import com.ld.qmwj.util.WaitDialog;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -111,6 +126,7 @@ public class MapFragment extends Fragment implements View.OnClickListener {
     // private double mCurrentlongitude=113.000691;        //对方当前经度
     private MyLocation mLocation;           //被监护方位置
     private LatLng currentLocation;         //当前用户位置
+    private ReverseGeoCodeResult.AddressComponent mComponent;   //被监护方位置地理信息
 
     private BitmapDescriptor monitor_icon; //定位的图标
     private float mCurrentx;             //当前位置 x方向的值
@@ -163,7 +179,7 @@ public class MapFragment extends Fragment implements View.OnClickListener {
                 }
                 Toast.makeText(MyApplication.getInstance(), "查找路线失败，请检查网络", Toast.LENGTH_SHORT).show();
             } else if (msg.what == HandlerUtil.REQUEST_ERROR) {
-                if (waitDialog != null) {
+                if (waitDialog != null&&!waitDialog.isHidden()) {
                     waitDialog.dismiss();
                 }
 
@@ -187,8 +203,8 @@ public class MapFragment extends Fragment implements View.OnClickListener {
         //在使用SDK各组件之前初始化context信息，传入ApplicationContext
         //注意该方法要再setContentView方法之前实现
         SDKInitializer.initialize(MyApplication.getInstance());
+        EventBus.getDefault().register(this);
         initGeoCoder();
-
         initData();
 
     }
@@ -276,6 +292,7 @@ public class MapFragment extends Fragment implements View.OnClickListener {
         MapStatusUpdate msu = MapStatusUpdateFactory.zoomTo(16.0f);
         mBaidumap.setMapStatus(msu);        //设置地图状态
         mBaidumap.setMyLocationEnabled(true);
+        mBaidumap.setOnMarkerClickListener(onMarkerClickListener);
         mMapView.removeViewAt(2);           //隐藏地图上比例尺
 
         radioGroup = (RadioGroup) view.findViewById(R.id.way_type);
@@ -383,6 +400,8 @@ public class MapFragment extends Fragment implements View.OnClickListener {
                         location_message2.setText(msg);
                         return;
                     }
+                    mComponent = result.getAddressDetail();
+                    MyApplication.getInstance().getRelateDao().updateLocationMessage(monitor.id, mComponent);
                     location_message2.setText(result.getAddress());
 
                 }
@@ -443,16 +462,38 @@ public class MapFragment extends Fragment implements View.OnClickListener {
         location_time.setText(TimeUtil.getTimeStr((long) mLocation.time, System.currentTimeMillis()) + "他(她)在：");
     }
 
-    public void requestPosition() {
+    public void requestPosition(int tag) {
         //请求对方
         MyApplication.getInstance().getSendMsgUtil().sendLocationRequest(
                 MyApplication.getInstance().getSpUtil().getUser().id, monitor.id);
+        // 向对方请求当前手环状态
+        Request request = new Request();
+        request.from_id = MyApplication.getInstance().getSpUtil().getUser().id;
+        request.into_id = monitor.id;
+        request.tag = MessageTag.BANDSTATE_REQ;
+        MyApplication.getInstance().getSendMsgUtil().sendMessageToServer(MyApplication.getInstance().getGson().toJson(request));
 
-        //等待对话框
-        waitDialog.setMsg("请求位置中...");
-        waitDialog.show(monitorActivity.getSupportFragmentManager(), "WAIT_DIALOG");
-        waitDialog.setCancelable(false);
-        handler.sendEmptyMessageDelayed(HandlerUtil.REQUEST_ERROR, 10000);
+        //请求最近心率
+        HeartDataRequest request2 = new HeartDataRequest();
+        request2.from_id = MyApplication.getInstance().getSpUtil().getUser().id;
+        request2.into_id = monitor.id;
+        String date = TimeUtil.getNowDateStr();
+        long from_time = TimeUtil.timeStrToLong(date);
+        long to_time = TimeUtil.timeStrToLong2(date);
+        request2.from_time = from_time;
+        request2.to_timie = to_time;
+        MyApplication.getInstance().getSendMsgUtil().sendMessageToServer(MyApplication.getInstance().getGson().toJson(request2));
+
+
+        if (tag == 0) {
+            //等待对话框
+            waitDialog.setMsg("请求位置中...");
+            waitDialog.show(monitorActivity.getSupportFragmentManager(), "WAIT_DIALOG");
+            waitDialog.setCancelable(false);
+            handler.sendEmptyMessageDelayed(HandlerUtil.REQUEST_ERROR, 7000);
+        }
+
+
     }
 
     public MyOrientationListener.OnOrientationListener onOrientationListener = new MyOrientationListener.OnOrientationListener() {
@@ -511,6 +552,7 @@ public class MapFragment extends Fragment implements View.OnClickListener {
         mMapView.onDestroy();
         // 释放地理编码检索实例
         geoCoder.destroy();
+        EventBus.getDefault().unregister(this);
     }
 
     @Override
@@ -536,7 +578,7 @@ public class MapFragment extends Fragment implements View.OnClickListener {
         //第一次显示时请求位置
         if (!hidden && isFirst && !isMapWay) {
             //请求位置
-            requestPosition();
+            requestPosition(0);
             isFirst = false;
         }
 
@@ -561,6 +603,7 @@ public class MapFragment extends Fragment implements View.OnClickListener {
 
     //    打开标记
     public void doMark() {
+        isNormal = false;
         //动画的方式显示布局文件
         head_layout.setVisibility(View.VISIBLE);
         bottom_layout.setVisibility(View.VISIBLE);
@@ -575,6 +618,7 @@ public class MapFragment extends Fragment implements View.OnClickListener {
 
         //设置点击地图监听器
         mBaidumap.clear();
+        isShowInfo = false;
         mBaidumap.setOnMapClickListener(mapClickLis);
         isSelect = true;
 
@@ -591,6 +635,7 @@ public class MapFragment extends Fragment implements View.OnClickListener {
      * 退出路线查询
      */
     public void doBack() {
+        isNormal = true;
         //动画的方式隐藏布局文件
         Animation anmi = AnimationUtils.loadAnimation(monitorActivity, R.anim.head_out);
         head_layout.startAnimation(anmi);
@@ -683,9 +728,9 @@ public class MapFragment extends Fragment implements View.OnClickListener {
                 break;
             case R.id.refresh_btn:
                 more_btn.setChecked(false);
-                requestPosition();
+                requestPosition(0);
                 break;
-            case R.id.way_btn:
+            case R.id.way_btn:      //历史路线
                 more_btn.setChecked(false);
                 Intent intent = new Intent(monitorActivity, RouteActivity.class);
                 intent.putExtra("monitor", monitor);
@@ -709,6 +754,9 @@ public class MapFragment extends Fragment implements View.OnClickListener {
      * 点击到这去按钮
      */
     private void doGoto() {
+        isNormal = false;
+        isShowInfo = false;
+
         mLocationClient.start();
         isSelect = false;
         mBaidumap.setOnMapClickListener(null);
@@ -908,6 +956,11 @@ public class MapFragment extends Fragment implements View.OnClickListener {
             }
 
         }
+
+        @Override
+        public void onGetBikingRouteResult(BikingRouteResult bikingRouteResult) {
+
+        }
     };
 
     /**
@@ -930,6 +983,7 @@ public class MapFragment extends Fragment implements View.OnClickListener {
         mBaidumap.showInfoWindow(mInfoWindow);
 
     }
+
 
     /**
      * 发送选中的路线
@@ -1084,6 +1138,9 @@ public class MapFragment extends Fragment implements View.OnClickListener {
     private BitmapDescriptor normalIcon5;
     private ArrayList<BitmapDescriptor> normalBitmapList;
 
+    private boolean isNormal = true;     //当前地图显示是否是正常显示（非路线点击）
+    private boolean isSafe = false;      //被监护方位置是否安全
+
     /**
      * 初始化动态图标
      */
@@ -1127,23 +1184,28 @@ public class MapFragment extends Fragment implements View.OnClickListener {
      * 绘制监护区
      */
     public void drawRangArea() {
-        boolean isContains = false;
         LatLng latLng = new LatLng(mLocation.latitude, mLocation.longitude);
         for (LocationRange range : rangeList) {
             if (range.latLng != null) {
-                isContains = SpatialRelationUtil.isCircleContainsPoint(range.latLng, range.range, latLng);
+                isSafe = SpatialRelationUtil.isCircleContainsPoint(range.latLng, range.range, latLng);
                 drawCircle(range.latLng, range.range);
             } else {
-                isContains = SpatialRelationUtil.isPolygonContainsPoint(range.points, latLng);
+                isSafe = SpatialRelationUtil.isPolygonContainsPoint(range.points, latLng);
                 drawPolygon(range.points);
             }
 
-            if (isContains)
+            if (isSafe) {
+                if (range.latLng != null)
+                    drawCircle(range.latLng, range.range);
+                else
+                    drawPolygon(range.points);
+
                 break;
+            }
         }
 
         ArrayList<BitmapDescriptor> bitmapList;
-        if (!isContains) {
+        if (!isSafe) {
             //将所有监护区域都绘制出来
             for (LocationRange range : rangeList) {
                 if (range.latLng != null) {
@@ -1157,13 +1219,15 @@ public class MapFragment extends Fragment implements View.OnClickListener {
             bitmapList = normalBitmapList;
         }
 
-        OverlayOptions option = new MarkerOptions()
-                .icons(bitmapList)
-                .period(20)        //设置多少帧刷新一次图片资源
-                .anchor(0.5f, 0.5f)      //中心点对齐对齐坐标的中心点
-                .position(new LatLng(mLocation.latitude, mLocation.longitude));
-
-        mBaidumap.addOverlay(option);
+        if (monitor.state == Config.ONLINE_STATE) {
+            //如果对方在线就绘制状态动画
+            OverlayOptions option = new MarkerOptions()
+                    .icons(bitmapList)
+                    .period(20)        //设置多少帧刷新一次图片资源
+                    .anchor(0.5f, 0.5f)      //中心点对齐对齐坐标的中心点
+                    .position(new LatLng(mLocation.latitude, mLocation.longitude));
+            mBaidumap.addOverlay(option);
+        }
 
     }
 
@@ -1205,4 +1269,192 @@ public class MapFragment extends Fragment implements View.OnClickListener {
     };
 
 
+    private boolean isShowInfo = false;       //判断当前对话框是显示还是隐藏
+    public BaiduMap.OnMarkerClickListener onMarkerClickListener = new BaiduMap.OnMarkerClickListener() {
+        @Override
+        public boolean onMarkerClick(Marker marker) {
+            LatLng latLng = marker.getPosition();
+            if (latLng.latitude == mLocation.latitude && latLng.longitude == mLocation.longitude) {
+                if (isShowInfo) {
+                    mBaidumap.hideInfoWindow();
+                    isShowInfo = false;
+                } else {
+                    showMonitorInfoDialog(latLng);
+                    isShowInfo = true;
+                }
+            }
+            return false;
+        }
+    };
+
+
+    /**
+     * 显示被监护方的信息
+     */
+    public void showMonitorInfoDialog(final LatLng latLng) {
+      /*  Intent intent=new Intent(monitorActivity,PanoramaActivity.class);
+        intent.putExtra("latitude",latLng.latitude);
+        intent.putExtra("longitude",latLng.longitude);
+        startActivity(intent);*/
+
+        InfoWindow mInfoWindow;
+        View v = monitorActivity.getLayoutInflater().inflate(R.layout.dialog_monitor_info, null);
+        TextView contect_state = (TextView) v.findViewById(R.id.contect_state_text);
+        //  TextView location_msg = (TextView) v.findViewById(R.id.location_text);
+        TextView location_state = (TextView) v.findViewById(R.id.location_state_text);
+        TextView miband_state = (TextView) v.findViewById(R.id.miband_state_text);
+        TextView heart_data = (TextView) v.findViewById(R.id.heart_data_text);
+        if (monitor.state == Config.ONLINE_STATE) {
+            contect_state.setTextColor(monitorActivity.getResources().getColorStateList(R.color.online_state));
+            contect_state.setText("监护中");
+            miband_state.setTextColor(Color.parseColor("#a0a0a0"));
+            if (monitor.bandstate == BandState.UNBIND)
+                miband_state.setText("未绑定");
+            else if (monitor.bandstate == BandState.UNCONNECT)
+                //手环未连接
+                miband_state.setText("未连接");
+            else if (monitor.bandstate == BandState.CONNECT) {
+                miband_state.setText("已连接");
+                miband_state.setTextColor(monitorActivity.getResources().getColorStateList(R.color.online_state));
+            }
+
+
+            heart_data.setText("");
+            if (monitor.bandstate == BandState.CONNECT) {
+
+
+                if (monitor.heart_rate <= 110 && monitor.heart_rate >= 60)
+                    heart_data.setTextColor(monitorActivity.getResources().getColorStateList(R.color.online_state));
+                else
+                    heart_data.setTextColor(monitorActivity.getResources().getColorStateList(R.color.not_online_state));
+                heart_data.setText(monitor.heart_rate + "");
+
+            }
+
+        } else {
+            contect_state.setTextColor(monitorActivity.getResources().getColorStateList(R.color.not_online_state));
+            contect_state.setText("未连接");
+            location_state.setText("");
+            miband_state.setText("");
+            heart_data.setText("");
+        }
+
+        if (rangeList.size() == 0)
+            location_state.setText("");
+        else if (isSafe) {
+            location_state.setTextColor(monitorActivity.getResources().getColorStateList(R.color.online_state));
+            location_state.setText("安全");
+        } else {
+            location_state.setTextColor(monitorActivity.getResources().getColorStateList(R.color.not_online_state));
+            location_state.setText("危险");
+        }
+
+        //加载图片中等尺寸
+        ImageView imageView = (ImageView) v.findViewById(R.id.panorama_view);
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(monitorActivity, PanoramaActivity.class);
+                intent.putExtra("latitude", latLng.latitude);
+                intent.putExtra("longitude", latLng.longitude);
+                startActivity(intent);
+            }
+        });
+
+        String imageurl2 = "http://api.map.baidu.com/panorama/v2?" +
+                "ak=8e8iHSqCaTnCysTgfksAeNhp" +
+                "&mcode=0C:4D:BE:03:BB:5B:18:05:E8:FA:62:9A:B3:7E:0D:5B:82:D6:2E:D0;com.ld.qmwj" +
+                "&width=200&height=200" +
+                "&location=" + latLng.longitude + "," + latLng.latitude +
+                "&fov=180";
+        //String imageurl="http://api.map.baidu.com/panorama/v2?ak=8e8iHSqCaTnCysTgfksAeNhp&mcode=0C:4D:BE:03:BB:5B:18:05:E8:FA:62:9A:B3:7E:0D:5B:82:D6:2E:D0;com.ld.qmwj&width=512&height=256&location=113.000437,28.138591&fov=180";
+        //Log.d(Config.TAG,"1:"+imageurl2);
+        // Log.d(Config.TAG,"2:"+imageurl);
+        Picasso.with(monitorActivity)
+                .load(imageurl2)
+                .error(R.drawable.app_bg)
+                .into(imageView);
+
+      /*  if (mComponent != null)
+            location_msg.setText(mComponent.district + mComponent.street + mComponent.streetNumber);
+        else
+            location_msg.setText("");*/
+
+
+        mInfoWindow = new InfoWindow(v, latLng, -47);
+        //显示InfoWindow
+        mBaidumap.showInfoWindow(mInfoWindow);
+
+
+    }
+
+    /**
+     * 处理传递来的handler消息
+     *
+     * @param tag
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void showInfo(Integer tag) {
+        if (tag == HandlerUtil.LOCATION_RESPONSE) {
+            //收到位置响应
+            MyLocation location = MyApplication.getInstance().getRelateDao().getLocation(monitor.id);
+            monitor = MyApplication.getInstance().getRelateDao().getMonitorById(monitor.id);
+            handler.removeMessages(HandlerUtil.REQUEST_ERROR);
+            waitDialog.dismiss();
+            Toast.makeText(monitorActivity, "更新了对方位置", Toast.LENGTH_SHORT).show();
+            updateLocation(location);
+
+            if (isShowInfo) {
+                //如果信息对话框在显示  就重新加载
+                mBaidumap.hideInfoWindow();
+                showMonitorInfoDialog(new LatLng(mLocation.latitude, mLocation.longitude));
+            }
+
+        } else if (tag == HandlerUtil.STATE_RESPONSE) {
+
+            //更新对方状态
+            monitor = MyApplication.getInstance().getRelateDao().getMonitorById(monitor.id);
+
+            if (isNormal) {
+                centerToMyPosition();
+            }
+            if (isShowInfo) {
+                //如果信息对话框在显示  就重新加载
+                mBaidumap.hideInfoWindow();
+                showMonitorInfoDialog(new LatLng(mLocation.latitude, mLocation.longitude));
+            }
+        }
+    }
+
+    /**
+     * 收到手环状态响应
+     *
+     * @param bandState
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void receiveBandState(BandState bandState) {
+        this.monitor = MyApplication.getInstance().getRelateDao().getMonitorById(monitor.id);
+        if (isShowInfo) {
+            //如果信息对话框在显示  就重新加载
+            mBaidumap.hideInfoWindow();
+            showMonitorInfoDialog(new LatLng(mLocation.latitude, mLocation.longitude));
+        }
+
+    }
+
+    /**
+     * 收到心跳数据响应
+     *
+     * @param heartData
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void receiveHeartData(HeartData heartData) {
+        this.monitor = MyApplication.getInstance().getRelateDao().getMonitorById(monitor.id);
+        if (isShowInfo) {
+            //如果信息对话框在显示  就重新加载
+            mBaidumap.hideInfoWindow();
+            showMonitorInfoDialog(new LatLng(mLocation.latitude, mLocation.longitude));
+        }
+
+    }
 }

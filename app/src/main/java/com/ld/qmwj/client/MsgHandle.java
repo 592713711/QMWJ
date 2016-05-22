@@ -8,14 +8,22 @@ import com.ld.qmwj.MyApplication;
 import com.ld.qmwj.message.AuthMessage;
 import com.ld.qmwj.message.MessageTag;
 import com.ld.qmwj.message.request.ChatRequest;
+import com.ld.qmwj.message.request.RecordRequest;
 import com.ld.qmwj.message.response.LoginResponse;
 import com.ld.qmwj.message.response.RefreshListRes;
 import com.ld.qmwj.message.response.Response;
+import com.ld.qmwj.model.RecordVoice;
+import com.ld.qmwj.model.chatmessage.RecordMsg;
 import com.ld.qmwj.model.chatmessage.SimpleMsg;
 import com.ld.qmwj.util.HandlerUtil;
 import com.ld.qmwj.util.SharePreferenceUtil;
 
 import org.greenrobot.eventbus.EventBus;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 
 import io.netty.channel.ChannelHandlerContext;
 
@@ -137,8 +145,58 @@ public class MsgHandle {
             case MessageTag.UPDATEALARM_REQ:    //更新闹钟
                 msgHandle_under.handleAlterAlarm(msgJson);
                 break;
+            case MessageTag.RECORD_REQ:
+                handleVoiceChat(msgJson);      //处理语音信息
+                break;
+            case MessageTag.OPEN_VOICE_RES:
+                int status=MyApplication.getInstance().getSpUtil().getUser().status;
+                if(status==Config.NOT_GUARDIAN_STATUS){
+                    //被监护
+                    Log.d(Config.TAG,"被监护");
+                    msgHandle_under. handleOpenVoice(msgJson);
+                }else{
+                    //主监护
+                    Log.d(Config.TAG,"监护");
+                    msgHandle_control. handleOpenVoice(msgJson);
+                }
+
+                break;
+            case MessageTag.CLOSE_VOICE_REQ:
+                Log.d(Config.TAG,"收到关闭");
+                EventBus.getDefault().post(HandlerUtil.CLOSE_VOICE);
+                break;
 
         }
+    }
+
+    private void handleVoiceChat(String msgJson) {
+        RecordRequest request=gson.fromJson(msgJson,RecordRequest.class);
+        RecordVoice recordVoice=request.recordVoice;
+        String filename=System.currentTimeMillis()+".amr";
+        File file=new File(MyApplication.getInstance().getRecordPath()+filename);
+        //将数据写入文件
+        try {
+            RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");
+            randomAccessFile.write(recordVoice.datas);
+            randomAccessFile.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        //储存信息到信息表
+        RecordMsg recordMsg = new RecordMsg();
+        recordMsg.duration = recordVoice.duration;
+        recordMsg.filename = filename;
+        String msg = MyApplication.getInstance().getGson().toJson(recordMsg);
+        recordMsg.is_coming = Config.FROM_MSG;
+        recordMsg.time = System.currentTimeMillis();
+
+        MyApplication.getInstance().getMessageDao().addMessage(
+                request.from_id, recordMsg, msg);
+        //发送聊天信息事件
+        EventBus.getDefault().post(HandlerUtil.CHAT_UPDATE);
     }
 
 

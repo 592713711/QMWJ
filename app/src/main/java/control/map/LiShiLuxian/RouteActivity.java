@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.CheckBox;
@@ -275,5 +276,9 @@ public class RouteActivity extends AppCompatActivity {
         super.onDestroy();
         //解除订阅事件
         EventBus.getDefault().unregister(this);
+    }
+
+    public void doQuit(View v) {
+        finish();
     }
 }

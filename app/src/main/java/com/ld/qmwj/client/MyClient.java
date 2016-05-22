@@ -62,7 +62,7 @@ public class MyClient implements Config {
                         .getBytes());
                 // 当达到最大长度仍没找到分隔符 就抛出异常
                 ch.pipeline().addLast(
-                        new DelimiterBasedFrameDecoder(10000, true, false, delimiter));
+                        new DelimiterBasedFrameDecoder(Integer.MAX_VALUE, true, false, delimiter));
                 // 将消息转化成字符串对象 下面的到的消息就不用转化了
                 //解码
                 ch.pipeline().addLast(new StringEncoder(Charset.forName("UTF-8")));

@@ -337,5 +337,8 @@ public class HeartDataActivity extends AppCompatActivity implements View.OnClick
                 calenderDialog.monthText.setText(date.month + "月");
         }
     };
+    public void doQuit(View v) {
+        finish();
+    }
 
 }

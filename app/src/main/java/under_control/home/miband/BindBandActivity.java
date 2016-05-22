@@ -208,4 +208,9 @@ public class BindBandActivity extends AppCompatActivity implements AdapterView.O
         };
     }
 
+    public void doQuit(View v) {
+        finish();
+    }
+
+
 }
